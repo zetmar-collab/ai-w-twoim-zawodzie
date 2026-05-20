@@ -918,8 +918,153 @@ textarea {
   line-height: 1.5;
 }
 
+/* ── Nowy prompt: przycisk nagłówka ─────────────────────────────────────── */
+.btn-add-prompt {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 8px;
+  border: 0;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-add-prompt:hover { opacity: 0.88; }
+
+/* ── Formularz nowego promptu ───────────────────────────────────────────── */
+.prompt-form {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.prompt-form h3 {
+  margin: 0;
+  font-size: 15px;
+  color: var(--text-strong);
+}
+.prompt-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+.prompt-form-row label,
+.prompt-form-full {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.prompt-form-row input,
+.prompt-form-row select,
+.prompt-form-full textarea {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s;
+  font-family: inherit;
+}
+.prompt-form-row input:focus,
+.prompt-form-row select:focus,
+.prompt-form-full textarea:focus {
+  border-color: var(--accent);
+}
+.prompt-form-full textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+.btn-save-prompt {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: 0;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-save-prompt:hover { opacity: 0.88; }
+
+/* ── Karty promptów: meta badges ────────────────────────────────────────── */
+.prompt-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 4px;
+}
+.prompt-badge {
+  font-size: 11px;
+  border-radius: 5px;
+  padding: 2px 7px;
+  font-weight: 600;
+}
+.prompt-badge.model {
+  background: rgba(0,200,150,.12);
+  color: var(--accent);
+}
+.prompt-badge.cat {
+  background: var(--surface-hover, #2a2a2a);
+  color: var(--muted);
+}
+
+/* ── Przyciski akcji karty promptu ──────────────────────────────────────── */
+.btn-copy-prompt,
+.btn-delete-prompt {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, background 0.15s;
+}
+.btn-copy-prompt {
+  background: var(--surface);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.btn-copy-prompt:hover { background: var(--accent); color: #fff; }
+.btn-delete-prompt {
+  background: transparent;
+  color: var(--muted);
+}
+.btn-delete-prompt:hover { background: #4a1c1c; color: #f87171; border-color: #7f2d2d; }
+
+.empty-hint {
+  color: var(--muted);
+  font-size: 14px;
+  padding: 20px 0;
+}
+
 @media (max-width: 760px) {
   .prompt-selects {
+    grid-template-columns: 1fr;
+  }
+  .prompt-form-row {
     grid-template-columns: 1fr;
   }
 }

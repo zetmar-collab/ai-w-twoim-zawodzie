@@ -30,6 +30,20 @@ import {
 } from 'lucide-react'
 import './App.css'
 
+// ─── Stałe promptów ──────────────────────────────────────────────────────────
+
+const BASE_AI_MODELS = [
+  'ChatGPT (GPT-4o)', 'ChatGPT (GPT-4)', 'Claude 3.5 Sonnet', 'Claude 3 Opus',
+  'Gemini 2.5 Flash', 'Gemini 2.0 Pro', 'Copilot', 'Perplexity',
+  'Midjourney', 'DALL-E 3', 'Stable Diffusion', 'Adobe Firefly',
+  'Canva AI', 'Runway ML', 'Suno AI', 'ElevenLabs', 'Notion AI',
+]
+
+const PROMPT_CATS = [
+  'Tekst', 'Grafika', 'Kod', 'Marketing', 'Research',
+  'Wideo', 'Audio', 'Organizacja', 'Sprzedaż', 'Inne',
+]
+
 // ─── Dane ─────────────────────────────────────────────────────────────────────
 
 const professions = [
@@ -255,6 +269,11 @@ function App() {
   })
   const [history, setHistory] = useState(() => getStoredValue('ai_stack_history', []))
   const [savedPrompts, setSavedPrompts] = useState(() => getStoredValue('saved_prompts', []))
+  const [promptFormOpen, setPromptFormOpen] = useState(false)
+  const [newPromptName, setNewPromptName] = useState('')
+  const [newPromptModel, setNewPromptModel] = useState('')
+  const [newPromptCat, setNewPromptCat] = useState('')
+  const [newPromptText, setNewPromptText] = useState('')
   const [projects, setProjects] = useState(() =>
     getStoredValue('ai_projects', [
       { id: 1, name: 'Pierwszy AI Stack', profession: 'Fotograf', status: 'W trakcie' },
@@ -485,6 +504,36 @@ function App() {
     setSavedPrompts(next)
     window.localStorage.setItem('saved_prompts', JSON.stringify(next))
     showToast('Prompt usunięty.')
+  }
+
+  function saveNewPrompt() {
+    if (!newPromptName.trim() || !newPromptText.trim()) {
+      showToast('Uzupełnij nazwę i treść promptu.')
+      return
+    }
+    const entry = {
+      id: Date.now().toString(),
+      name: newPromptName.trim(),
+      model: newPromptModel,
+      category: newPromptCat,
+      prompt: newPromptText.trim(),
+    }
+    const next = [entry, ...savedPrompts]
+    setSavedPrompts(next)
+    window.localStorage.setItem('saved_prompts', JSON.stringify(next))
+    setNewPromptName('')
+    setNewPromptModel('')
+    setNewPromptCat('')
+    setNewPromptText('')
+    setPromptFormOpen(false)
+    showToast('Prompt zapisany!')
+  }
+
+  function copyPromptText(text) {
+    navigator.clipboard.writeText(text).then(
+      function() { showToast('Prompt skopiowany!') },
+      function() { showToast('Nie można skopiować.') }
+    )
   }
 
   function addProject() {
@@ -866,25 +915,128 @@ function App() {
   }
 
   function renderPrompts() {
+    const stackModelNames = stack.map(function(t) { return t.name })
+    const allModels = Array.from(new Set([...stackModelNames, ...BASE_AI_MODELS]))
+
     return (
       <section className="view-panel">
-        <h2>Zapisane prompty</h2>
+        <div className="panel-heading">
+          <div>
+            <h2>Zapisane prompty</h2>
+            <p>{savedPrompts.length} zapisanych promptów</p>
+          </div>
+          <button
+            type="button"
+            className="btn-add-prompt"
+            onClick={() => setPromptFormOpen(function(v) { return !v })}
+          >
+            <Plus size={16} />
+            {promptFormOpen ? 'Anuluj' : 'Nowy prompt'}
+          </button>
+        </div>
+
+        {promptFormOpen && (
+          <div className="prompt-form">
+            <h3>Dodaj nowy prompt</h3>
+            <div className="prompt-form-row">
+              <label>
+                Nazwa
+                <input
+                  type="text"
+                  placeholder="np. Opis sesji zdjęciowej"
+                  value={newPromptName}
+                  onChange={function(e) { setNewPromptName(e.target.value) }}
+                  maxLength={80}
+                />
+              </label>
+              <label>
+                Model AI
+                <select
+                  value={newPromptModel}
+                  onChange={function(e) { setNewPromptModel(e.target.value) }}
+                >
+                  <option value="">— wybierz model —</option>
+                  {stack.length > 0 && (
+                    <optgroup label="Z Twojego stacka">
+                      {stackModelNames.map(function(m) {
+                        return <option key={m} value={m}>{m}</option>
+                      })}
+                    </optgroup>
+                  )}
+                  <optgroup label="Popularne modele">
+                    {BASE_AI_MODELS.map(function(m) {
+                      return <option key={m} value={m}>{m}</option>
+                    })}
+                  </optgroup>
+                </select>
+              </label>
+              <label>
+                Zastosowanie
+                <select
+                  value={newPromptCat}
+                  onChange={function(e) { setNewPromptCat(e.target.value) }}
+                >
+                  <option value="">— wybierz typ —</option>
+                  {PROMPT_CATS.map(function(c) {
+                    return <option key={c} value={c}>{c}</option>
+                  })}
+                </select>
+              </label>
+            </div>
+            <label className="prompt-form-full">
+              Treść promptu
+              <textarea
+                placeholder="Wpisz lub wklej prompt…"
+                value={newPromptText}
+                onChange={function(e) { setNewPromptText(e.target.value) }}
+                rows={5}
+              />
+            </label>
+            <button type="button" className="btn-save-prompt" onClick={saveNewPrompt}>
+              <Save size={16} /> Zapisz prompt
+            </button>
+          </div>
+        )}
+
         <div className="prompt-grid">
           {savedPrompts.length ? (
-            savedPrompts.map((item) => (
-              <article className="prompt-card" key={item.id}>
-                <div>
-                  <strong>{item.name}</strong>
-                  <span>{item.category}</span>
-                </div>
-                <p>{item.prompt}</p>
-                <button type="button" onClick={() => deletePrompt(item.id)}>
-                  <Trash2 size={16} /> Usuń
-                </button>
-              </article>
-            ))
+            savedPrompts.map(function(item) {
+              return (
+                <article className="prompt-card" key={item.id}>
+                  <div className="prompt-card-header">
+                    <div>
+                      <strong>{item.name}</strong>
+                      <div className="prompt-card-meta">
+                        {item.model && <span className="prompt-badge model">{item.model}</span>}
+                        {item.category && <span className="prompt-badge cat">{item.category}</span>}
+                        {!item.model && !item.category && item.category !== undefined && (
+                          <span className="prompt-badge cat">{item.category || 'Brak kategorii'}</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <p className="prompt-text">{item.prompt}</p>
+                  <div className="prompt-card-actions">
+                    <button
+                      type="button"
+                      className="btn-copy-prompt"
+                      onClick={function() { copyPromptText(item.prompt) }}
+                    >
+                      <Copy size={15} /> Kopiuj prompt
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-delete-prompt"
+                      onClick={function() { deletePrompt(item.id) }}
+                    >
+                      <Trash2 size={15} /> Usuń
+                    </button>
+                  </div>
+                </article>
+              )
+            })
           ) : (
-            <p>Zapisz prompt przyciskiem dyskietki w widoku stacka.</p>
+            <p className="empty-hint">Brak zapisanych promptów. Dodaj nowy lub zapisz z widoku stacka.</p>
           )}
         </div>
       </section>
