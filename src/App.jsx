@@ -748,6 +748,20 @@ function App() {
     )
   }
 
+  function createStackForProject(project) {
+    // Dopasuj projekt do zawodu
+    const matched = professions.find(
+      (p) => p.label.toLowerCase() === (project.profession || '').toLowerCase()
+    )
+    if (matched) {
+      switchProfession(matched.id)
+    }
+    setFormStep(1)
+    setActiveView('dashboard')
+    setStatus('Generujesz stack dla projektu: ' + project.name + '. Uzupelnij formularz i kliknij Generuj.')
+    showToast('Projekt "' + project.name + '" wczytany. Wypelnij formularz i wygeneruj stack.')
+  }
+
   function renderProjects() {
     return (
       <section className="view-panel">
@@ -770,10 +784,18 @@ function App() {
         </div>
         <div className="item-grid">
           {projects.map((project) => (
-            <article className="item-card" key={project.id}>
+            <article className="item-card project-card" key={project.id}>
               <strong>{project.name}</strong>
-              <p>{project.profession}</p>
-              <span>{project.status}</span>
+              <p className="project-profession">{project.profession}</p>
+              <span className="project-status">{project.status}</span>
+              <button
+                className="project-stack-btn"
+                type="button"
+                onClick={function(){ createStackForProject(project) }}
+              >
+                <Sparkles size={14} />
+                Utwórz stack
+              </button>
             </article>
           ))}
         </div>
