@@ -2364,3 +2364,153 @@ textarea {
   .training-tool-header { padding: 12px 14px; }
   .training-lesson { padding: 14px 14px; }
 }
+
+/* ─── Inspiracje ──────────────────────────────────────────────────────────── */
+
+.btn-shuffle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+.btn-shuffle:hover { border-color: var(--accent); color: var(--accent); }
+
+.insp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+}
+
+.insp-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.insp-card:hover { border-color: var(--accent); box-shadow: 0 4px 18px rgba(0,0,0,.12); }
+.insp-card.done {
+  border-color: var(--accent);
+  background: rgba(0,200,150,.04);
+}
+
+.insp-card-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.insp-done-icon { color: var(--accent); margin-left: auto; }
+
+.insp-badge {
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 5px;
+  padding: 2px 8px;
+}
+.insp-quick    { background: rgba(59,130,246,.15); color: #60a5fa; }
+.insp-workflow { background: rgba(234,179, 8,.15); color: #facc15; }
+.insp-idea     { background: rgba(168,85,247,.15); color: #c084fc; }
+
+.insp-time {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.insp-title {
+  font-size: 14px;
+  color: var(--text-strong);
+  line-height: 1.3;
+}
+
+.insp-desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.insp-prompt-box {
+  background: var(--bg);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 7px 7px 0;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.insp-prompt-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.insp-prompt-text {
+  font-size: 12px;
+  color: var(--text);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.insp-actions {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+.insp-btn-copy,
+.insp-btn-try,
+.insp-btn-done {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .15s, color .15s, border-color .15s;
+}
+
+.insp-btn-copy {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+.insp-btn-copy:hover { border-color: var(--accent); color: var(--accent); }
+
+.insp-btn-try {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+.insp-btn-try:hover { border-color: var(--accent); color: var(--accent); }
+
+.insp-btn-done {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+}
+.insp-btn-done:hover,
+.insp-btn-done.is-done {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+@media (max-width: 640px) {
+  .insp-grid { grid-template-columns: 1fr; }
+}

@@ -255,6 +255,57 @@ function getToolLessons(tool) {
   ]
 }
 
+function getStackInspirations(stack) {
+  const result = []
+  stack.forEach(function(tool) {
+    result.push({
+      id: tool.name + '-quick',
+      type: 'quick',
+      typeLabel: 'Szybki test',
+      time: '5 min',
+      title: 'Przetestuj ' + tool.name + ' dziś',
+      desc: 'Wybierz jedno realne zadanie z dziś i wykonaj je za pomocą ' + tool.name + '. ' + tool.value,
+      prompt: tool.prompt,
+      tool: tool.name,
+      url: tool.url || '#',
+    })
+    result.push({
+      id: tool.name + '-workflow',
+      type: 'workflow',
+      typeLabel: 'Workflow',
+      time: '30 min',
+      title: 'Mini-automatyzacja z ' + tool.name,
+      desc: 'Zidentyfikuj jeden powtarzalny proces i zautomatyzuj go za pomocą ' + tool.name + '. Kategoria: ' + tool.category + '.',
+      prompt: 'Opisz krok po kroku jak ' + tool.name + ' może zastąpić moją ręczną pracę przy: [wpisz zadanie]. Daj gotowy przepływ pracy.',
+      tool: tool.name,
+      url: tool.url || '#',
+    })
+    result.push({
+      id: tool.name + '-idea',
+      type: 'idea',
+      typeLabel: 'Pomysł',
+      time: '15 min',
+      title: tool.name + ' — nowe zastosowanie',
+      desc: 'Wymyśl nieoczywiste zastosowanie ' + tool.name + ' w kategorii ' + tool.category + '. Co możesz zrobić inaczej niż dotychczas?',
+      prompt: 'Podaj 5 nieoczywistych sposobów użycia ' + tool.name + ' dla kogoś w mojej pracy. Skup się na oszczędności czasu i energii.',
+      tool: tool.name,
+      url: tool.url || '#',
+    })
+  })
+  return result
+}
+
+function seededShuffle(arr, seed) {
+  const result = arr.slice()
+  let s = seed >>> 0
+  for (let i = result.length - 1; i > 0; i--) {
+    s = (Math.imul(s, 1664525) + 1013904223) >>> 0
+    const j = s % (i + 1)
+    const tmp = result[i]; result[i] = result[j]; result[j] = tmp
+  }
+  return result
+}
+
 function getStoredValue(key, fallback) {
   try {
     const raw = window.localStorage.getItem(key)
@@ -306,6 +357,9 @@ function App() {
   const [completedLessons, setCompletedLessons] = useState(() => getStoredValue('completed_lessons', []))
   const [trainingFilter, setTrainingFilter] = useState('all')
   const [expandedTool, setExpandedTool] = useState(null)
+  const [doneInspirations, setDoneInspirations] = useState(() => getStoredValue('done_inspirations', []))
+  const [inspirationFilter, setInspirationFilter] = useState('all')
+  const [shuffleSeed, setShuffleSeed] = useState(1)
   const [newPromptName, setNewPromptName] = useState('')
   const [newPromptModel, setNewPromptModel] = useState('')
   const [newPromptCat, setNewPromptCat] = useState('')
@@ -579,6 +633,15 @@ function App() {
     setCompletedLessons(next)
     window.localStorage.setItem('completed_lessons', JSON.stringify(next))
     if (!completedLessons.includes(lessonId)) showToast('Lekcja ukończona!')
+  }
+
+  function toggleInspiration(id) {
+    const next = doneInspirations.includes(id)
+      ? doneInspirations.filter(function(x) { return x !== id })
+      : [...doneInspirations, id]
+    setDoneInspirations(next)
+    window.localStorage.setItem('done_inspirations', JSON.stringify(next))
+    if (!doneInspirations.includes(id)) showToast('Wyzwanie zaliczone!')
   }
 
   function addProject() {
@@ -1318,6 +1381,111 @@ function App() {
     )
   }
 
+  function renderInspirations() {
+    const isFallback = stack.length > 0 && stack[0].name === fallbackStack[0].name &&
+      stack.length === fallbackStack.length
+    const all = seededShuffle(getStackInspirations(stack), shuffleSeed)
+    const filtered = inspirationFilter === 'all' ? all : all.filter(function(c) { return c.type === inspirationFilter })
+    const doneCount = all.filter(function(c) { return doneInspirations.includes(c.id) }).length
+    const typeColors = { quick: 'insp-quick', workflow: 'insp-workflow', idea: 'insp-idea' }
+
+    return (
+      <section className="view-panel">
+        <div className="panel-heading">
+          <div>
+            <h2>Inspiracje</h2>
+            <p>{doneCount} / {all.length} wyzwań ukończonych</p>
+          </div>
+          <button
+            type="button"
+            className="btn-shuffle"
+            onClick={function() { setShuffleSeed(function(s) { return s + 1 }) }}
+          >
+            <RefreshCcw size={15} /> Losuj kolejność
+          </button>
+        </div>
+
+        {isFallback ? (
+          <div className="training-no-stack">
+            <WandSparkles size={48} />
+            <h3>Brak spersonalizowanego stacka</h3>
+            <p>Wygeneruj swój AI Stack, aby zobaczyć wyzwania dopasowane do Twoich narzędzi.</p>
+            <button type="button" onClick={function() { setActiveView('dashboard') }}>
+              Przejdź do generatora
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="training-filters">
+              {[['all','Wszystkie'], ['quick','Szybki test'], ['workflow','Workflow'], ['idea','Pomysł']].map(function(pair) {
+                return (
+                  <button
+                    key={pair[0]}
+                    type="button"
+                    className={inspirationFilter === pair[0] ? 'active' : ''}
+                    onClick={function() { setInspirationFilter(pair[0]) }}
+                  >
+                    {pair[1]}
+                  </button>
+                )
+              })}
+            </div>
+
+            {filtered.length === 0 && (
+              <p className="empty-hint">Brak wyzwań w tej kategorii.</p>
+            )}
+
+            <div className="insp-grid">
+              {filtered.map(function(card) {
+                const isDone = doneInspirations.includes(card.id)
+                return (
+                  <article key={card.id} className={'insp-card' + (isDone ? ' done' : '')}>
+                    <div className="insp-card-top">
+                      <span className={'insp-badge ' + (typeColors[card.type] || '')}>{card.typeLabel}</span>
+                      <span className="insp-time">{card.time}</span>
+                      {isDone && <Check size={15} className="insp-done-icon" />}
+                    </div>
+                    <strong className="insp-title">{card.title}</strong>
+                    <p className="insp-desc">{card.desc}</p>
+                    <div className="insp-prompt-box">
+                      <span className="insp-prompt-label">Prompt do wypróbowania:</span>
+                      <p className="insp-prompt-text">{card.prompt}</p>
+                    </div>
+                    <div className="insp-actions">
+                      <button
+                        type="button"
+                        className="insp-btn-copy"
+                        onClick={function() { copyPromptText(card.prompt) }}
+                      >
+                        <Copy size={13} /> Kopiuj prompt
+                      </button>
+                      <a
+                        href={card.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="insp-btn-try"
+                      >
+                        <ExternalLink size={13} /> Wypróbuj
+                      </a>
+                      <button
+                        type="button"
+                        className={'insp-btn-done' + (isDone ? ' is-done' : '')}
+                        onClick={function() { toggleInspiration(card.id) }}
+                      >
+                        <Check size={13} />
+                        {isDone ? 'Zrobione' : 'Oznacz jako zrobione'}
+                      </button>
+                    </div>
+                  </article>
+                )
+              })}
+            </div>
+          </>
+        )}
+      </section>
+    )
+  }
+
   function renderActiveView() {
     if (activeView === 'dashboard') return renderDashboard()
     if (activeView === 'stack') return <div className="single-view">{renderStackPanel()}</div>
@@ -1326,7 +1494,7 @@ function App() {
     if (activeView === 'prompts') return renderPrompts()
     if (activeView === 'tools') return renderLibrary()
     if (activeView === 'training') return renderTraining()
-    return renderSimpleList('Inspiracje', inspirationItems)
+    return renderInspirations()
   }
 
   const initials = userName
