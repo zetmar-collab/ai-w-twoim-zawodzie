@@ -222,6 +222,39 @@ function buildPromptUrl(tool) {
   return tool.url || 'https://gemini.google.com/'
 }
 
+function getToolLessons(tool) {
+  const promptSnippet = (tool.prompt || '').slice(0, 90) + ((tool.prompt || '').length > 90 ? '…' : '')
+  return [
+    {
+      id: tool.name + '-0',
+      title: 'Pierwsze kroki z ' + tool.name,
+      duration: '10 min',
+      desc: 'Poznaj interfejs i możliwości narzędzia. ' + tool.value,
+      task: 'Otwórz narzędzie i przetestuj gotowy prompt: „' + promptSnippet + '"',
+      url: tool.url || '#',
+      level: 'Podstawowy',
+    },
+    {
+      id: tool.name + '-1',
+      title: tool.name + ' w codziennej pracy',
+      duration: '15 min',
+      desc: 'Wdróż ' + tool.name + ' do realnych zadań. Kategoria: ' + tool.category + '. ' + tool.value,
+      task: 'Dostosuj gotowy prompt do konkretnego zadania z bieżącego tygodnia i zapisz efekt.',
+      url: tool.url || '#',
+      level: 'Średni',
+    },
+    {
+      id: tool.name + '-2',
+      title: 'Workflow z ' + tool.name + ' — oszczędność czasu',
+      duration: '20 min',
+      desc: 'Połącz ' + tool.name + ' z innymi narzędziami ze swojego stacka i zbuduj mini-automatyzację.',
+      task: 'Zapisz 3 przypadki, w których ' + tool.name + ' zastępuje Twoją manualną pracę.',
+      url: tool.url || '#',
+      level: 'Zaawansowany',
+    },
+  ]
+}
+
 function getStoredValue(key, fallback) {
   try {
     const raw = window.localStorage.getItem(key)
@@ -270,6 +303,9 @@ function App() {
   const [history, setHistory] = useState(() => getStoredValue('ai_stack_history', []))
   const [savedPrompts, setSavedPrompts] = useState(() => getStoredValue('saved_prompts', []))
   const [promptFormOpen, setPromptFormOpen] = useState(false)
+  const [completedLessons, setCompletedLessons] = useState(() => getStoredValue('completed_lessons', []))
+  const [trainingFilter, setTrainingFilter] = useState('all')
+  const [expandedTool, setExpandedTool] = useState(null)
   const [newPromptName, setNewPromptName] = useState('')
   const [newPromptModel, setNewPromptModel] = useState('')
   const [newPromptCat, setNewPromptCat] = useState('')
@@ -534,6 +570,15 @@ function App() {
       function() { showToast('Prompt skopiowany!') },
       function() { showToast('Nie można skopiować.') }
     )
+  }
+
+  function toggleLesson(lessonId) {
+    const next = completedLessons.includes(lessonId)
+      ? completedLessons.filter(function(id) { return id !== lessonId })
+      : [...completedLessons, lessonId]
+    setCompletedLessons(next)
+    window.localStorage.setItem('completed_lessons', JSON.stringify(next))
+    if (!completedLessons.includes(lessonId)) showToast('Lekcja ukończona!')
   }
 
   function addProject() {
@@ -1132,6 +1177,147 @@ function App() {
     )
   }
 
+  function renderTraining() {
+    const isFallback = stack.length > 0 && stack[0].name === fallbackStack[0].name &&
+      stack.length === fallbackStack.length
+    const allLessons = stack.flatMap(getToolLessons)
+    const totalCount = allLessons.length
+    const doneCount = allLessons.filter(function(l) { return completedLessons.includes(l.id) }).length
+    const progress = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0
+    const levelClass = { 'Podstawowy': 'level-basic', 'Średni': 'level-mid', 'Zaawansowany': 'level-adv' }
+
+    return (
+      <section className="view-panel">
+        <div className="panel-heading">
+          <div>
+            <h2>Plan szkoleń</h2>
+            <p>Spersonalizowany plan na podstawie Twojego AI Stacka</p>
+          </div>
+        </div>
+
+        {isFallback ? (
+          <div className="training-no-stack">
+            <GraduationCap size={48} />
+            <h3>Brak spersonalizowanego stacka</h3>
+            <p>Wygeneruj swój AI Stack, aby zobaczyć plan szkoleń dopasowany do Twojego zawodu i narzędzi.</p>
+            <button type="button" onClick={function() { setActiveView('dashboard') }}>
+              Przejdź do generatora
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="training-progress-wrap">
+              <div className="training-progress-header">
+                <span>{doneCount} / {totalCount} lekcji ukończonych</span>
+                <span className="training-pct">{progress}%</span>
+              </div>
+              <div className="training-bar">
+                <div className="training-bar-fill" style={{ width: progress + '%' }} />
+              </div>
+            </div>
+
+            <div className="training-filters">
+              {[['all', 'Wszystkie'], ['todo', 'Do zrobienia'], ['done', 'Ukończone']].map(function(pair) {
+                return (
+                  <button
+                    key={pair[0]}
+                    type="button"
+                    className={trainingFilter === pair[0] ? 'active' : ''}
+                    onClick={function() { setTrainingFilter(pair[0]) }}
+                  >
+                    {pair[1]}
+                  </button>
+                )
+              })}
+            </div>
+
+            <div className="training-list">
+              {stack.map(function(tool) {
+                const lessons = getToolLessons(tool)
+                const toolDone = lessons.filter(function(l) { return completedLessons.includes(l.id) }).length
+                const isExpanded = expandedTool === tool.name
+                const allDone = toolDone === lessons.length
+
+                if (trainingFilter === 'done' && toolDone === 0) return null
+                if (trainingFilter === 'todo' && allDone) return null
+
+                return (
+                  <div key={tool.name} className={'training-tool' + (allDone ? ' all-done' : '')}>
+                    <button
+                      type="button"
+                      className="training-tool-header"
+                      onClick={function() { setExpandedTool(isExpanded ? null : tool.name) }}
+                    >
+                      <div className="training-tool-left">
+                        <strong>{tool.name}</strong>
+                        <span className="training-tool-cat">{tool.category}</span>
+                      </div>
+                      <div className="training-tool-right">
+                        <span className="training-mini-progress">
+                          {toolDone}/{lessons.length}
+                        </span>
+                        {allDone && <Check size={15} className="training-all-done-icon" />}
+                        <ChevronDown
+                          size={16}
+                          className={'training-chevron' + (isExpanded ? ' open' : '')}
+                        />
+                      </div>
+                    </button>
+
+                    {isExpanded && (
+                      <div className="training-lessons">
+                        {lessons.map(function(lesson) {
+                          const isDone = completedLessons.includes(lesson.id)
+                          if (trainingFilter === 'done' && !isDone) return null
+                          if (trainingFilter === 'todo' && isDone) return null
+
+                          return (
+                            <div key={lesson.id} className={'training-lesson' + (isDone ? ' done' : '')}>
+                              <div className="training-lesson-meta">
+                                <span className={'training-level ' + (levelClass[lesson.level] || '')}>
+                                  {lesson.level}
+                                </span>
+                                <span className="training-duration">{lesson.duration}</span>
+                              </div>
+                              <strong className="training-lesson-title">{lesson.title}</strong>
+                              <p className="training-lesson-desc">{lesson.desc}</p>
+                              <div className="training-task-box">
+                                <Target size={13} />
+                                <span>{lesson.task}</span>
+                              </div>
+                              <div className="training-lesson-actions">
+                                <a
+                                  href={lesson.url}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="training-btn-open"
+                                >
+                                  <ExternalLink size={13} /> Otwórz narzędzie
+                                </a>
+                                <button
+                                  type="button"
+                                  className={'training-btn-done' + (isDone ? ' is-done' : '')}
+                                  onClick={function() { toggleLesson(lesson.id) }}
+                                >
+                                  <Check size={13} />
+                                  {isDone ? 'Ukończona' : 'Oznacz jako ukończoną'}
+                                </button>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </>
+        )}
+      </section>
+    )
+  }
+
   function renderActiveView() {
     if (activeView === 'dashboard') return renderDashboard()
     if (activeView === 'stack') return <div className="single-view">{renderStackPanel()}</div>
@@ -1139,7 +1325,7 @@ function App() {
     if (activeView === 'history') return renderHistory()
     if (activeView === 'prompts') return renderPrompts()
     if (activeView === 'tools') return renderLibrary()
-    if (activeView === 'training') return renderSimpleList('Szkolenia', learningItems)
+    if (activeView === 'training') return renderTraining()
     return renderSimpleList('Inspiracje', inspirationItems)
   }
 
