@@ -274,6 +274,8 @@ function App() {
   )
   const [toast, setToast] = useState(null)
   const [formStep, setFormStep] = useState(1)
+  const [userName, setUserName] = useState(() => window.localStorage.getItem('user_name') || '')
+  const [profileOpen, setProfileOpen] = useState(false)
 
   // Biblioteka – wyszukiwanie i filtrowanie
   const [librarySearch, setLibrarySearch] = useState('')
@@ -929,6 +931,10 @@ function App() {
     return renderSimpleList('Inspiracje', inspirationItems)
   }
 
+  const initials = userName
+    ? userName.trim().split(' ').filter(function(w){ return w.length > 0 }).map(function(w){ return w[0].toUpperCase() }).join('').slice(0, 2)
+    : '?'
+
   return (
     <div className="app-shell">
       {toast && <Toast message={toast} onClose={() => setToast(null)} />}
@@ -988,12 +994,18 @@ function App() {
             <p>Darmowa aplikacja do budowania praktycznych workflow AI.</p>
           </div>
           <div className="top-actions">
-            <button className="icon-button" type="button" aria-label="Powiadomienia">
-              <Bell size={19} />
-            </button>
-            <button className="profile" type="button" aria-label="Profil użytkownika">
-              MM <ChevronDown size={15} />
-            </button>
+            <div className="profile-wrapper">
+              <button className="profile" type="button" onClick={function(){ setProfileOpen(function(o){ return !o }) }}>
+                {initials} <ChevronDown size={15} />
+              </button>
+              {profileOpen && (
+                <div className="profile-dropdown">
+                  <label className="profile-label">Twoje imie</label>
+                  <input className="profile-input" type="text" value={userName} placeholder="np. Jan Kowalski" onChange={function(e){ setUserName(e.target.value); window.localStorage.setItem('user_name', e.target.value) }} />
+                  <button className="ghost profile-close" type="button" onClick={function(){ setProfileOpen(false) }}>Zamknij</button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 
