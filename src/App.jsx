@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Bell,
   BookOpen,
@@ -276,6 +276,7 @@ function App() {
   const [formStep, setFormStep] = useState(1)
   const [userName, setUserName] = useState(() => window.localStorage.getItem('user_name') || '')
   const [profileOpen, setProfileOpen] = useState(false)
+  const fileInputRef = useRef(null)
 
   // Biblioteka – wyszukiwanie i filtrowanie
   const [librarySearch, setLibrarySearch] = useState('')
@@ -421,28 +422,52 @@ function App() {
   }
 
   function exportStack() {
-    const lines = [
-      `AI Stack – ${profession.label}`,
-      `Data: ${new Date().toLocaleDateString('pl-PL')}`,
-      '─'.repeat(52),
-      '',
-      ...stack.map(
-        (tool, i) =>
-          `${i + 1}. ${tool.name} [${tool.category}]\n   ${tool.value}\n   Prompt: ${tool.prompt}\n   Link: ${tool.url}`,
-      ),
-      '',
-      '─'.repeat(52),
-      `Oszczędności: ${summary.weeklyHours} tygodniowo | Wydajność: ${summary.productivity} | Zwrot: ${summary.monthlyValue}`,
-      '* Wartości szacunkowe wygenerowane przez AI – nie stanowią gwarancji wyników.',
-    ]
-    const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' })
+    const data = {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      profession: profession.label,
+      level,
+      stack,
+      summary,
+    }
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `ai-stack-${profession.id}.txt`
+    a.download = `ai-stack-${profession.id}-${Date.now()}.json`
     a.click()
     URL.revokeObjectURL(url)
-    showToast('Stack pobrany jako plik .txt')
+    showToast('Stack wyeksportowany jako plik .json')
+  }
+
+  function importStack(file) {
+    const reader = new FileReader()
+    reader.onload = function(e) {
+      try {
+        const data = JSON.parse(e.target.result)
+        if (!Array.isArray(data.stack) || data.stack.length === 0) {
+          showToast('Nieprawidlowy plik – brak tablicy stack.')
+          return
+        }
+        const valid = data.stack.every(function(t) {
+          return t.name && t.category && t.value && t.prompt
+        })
+        if (!valid) {
+          showToast('Plik JSON ma nieprawidlowa strukture narzedzi.')
+          return
+        }
+        setStack(data.stack.slice(0, 10))
+        window.localStorage.setItem('ai_stack', JSON.stringify(data.stack.slice(0, 10)))
+        if (data.summary) {
+          setSummary(data.summary)
+        }
+        setActiveView('stack')
+        showToast('Stack wczytany z pliku: ' + data.stack.length + ' narzedzi.')
+      } catch {
+        showToast('Blad odczytu pliku JSON.')
+      }
+    }
+    reader.readAsText(file)
   }
 
   function savePrompt(tool) {
@@ -678,10 +703,23 @@ function App() {
               Dopasowany do: <b>{profession.label}</b> · Poziom: <b>{level}</b>
             </p>
           </div>
-          <button type="button" onClick={exportStack}>
-            <Download size={17} />
-            Pobierz stack
-          </button>
+          <div className="stack-export-btns">
+            <button type="button" onClick={exportStack}>
+              <Download size={17} />
+              Eksportuj
+            </button>
+            <button type="button" onClick={() => fileInputRef.current && fileInputRef.current.click()}>
+              <Save size={17} />
+              Importuj
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              style={{ display: 'none' }}
+              onChange={(e) => { if (e.target.files && e.target.files[0]) { importStack(e.target.files[0]); e.target.value = '' } }}
+            />
+          </div>
         </div>
 
         <div className="tool-list">

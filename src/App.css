@@ -731,6 +731,31 @@ textarea {
   opacity: 0.88;
 }
 
+.stack-export-btns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.stack-export-btns button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.stack-export-btns button:hover {
+  background: var(--surface-hover, #2a2a2a);
+  border-color: var(--accent);
+}
+
 .item-card strong,
 .prompt-card strong,
 .history-row strong {
