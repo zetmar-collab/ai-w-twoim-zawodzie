@@ -2514,3 +2514,58 @@ textarea {
 @media (max-width: 640px) {
   .insp-grid { grid-template-columns: 1fr; }
 }
+
+/* ─── Poprawki v1.2 ───────────────────────────────────────────────────────── */
+
+.btn-danger-ghost {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 13px; border-radius: 8px;
+  border: 1px solid #b91c1c; background: transparent;
+  color: #f87171; font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.btn-danger-ghost:hover { background: #b91c1c; color: #fff; }
+
+.profile-reset { margin-top: 6px; width: 100%; justify-content: center; }
+
+.prompt-header-actions {
+  display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+}
+.btn-export-prompts {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 7px 13px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--text); font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+.btn-export-prompts:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ─── Biblioteka — karty z promptami ─────────────────────────────────────── */
+.lib-card { display: flex; flex-direction: column; gap: 10px; }
+.lib-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.lib-card-top strong { font-size: 14px; color: var(--text-strong); }
+
+.lib-prompts { display: flex; flex-direction: column; gap: 8px; }
+.lib-prompts-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .06em; color: var(--accent);
+}
+.lib-prompt-row {
+  background: var(--bg); border-left: 3px solid var(--accent);
+  border-radius: 0 7px 7px 0; padding: 8px 10px;
+  display: flex; flex-direction: column; gap: 5px;
+}
+.lib-prompt-name { font-size: 12px; font-weight: 700; color: var(--text-strong); }
+.lib-prompt-text {
+  font-size: 12px; color: var(--muted); line-height: 1.4; margin: 0;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.lib-prompt-actions { display: flex; gap: 6px; }
+.lib-btn-copy, .lib-btn-save {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 9px; border-radius: 6px; font-size: 11px; font-weight: 600;
+  cursor: pointer; border: 1px solid var(--border); background: var(--surface);
+  color: var(--text); transition: background .15s, color .15s, border-color .15s;
+}
+.lib-btn-copy:hover { border-color: var(--accent); color: var(--accent); }
+.lib-btn-save:hover { background: var(--accent); color: #fff; border-color: var(--accent); }

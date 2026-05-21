@@ -213,6 +213,59 @@ const inspirationItems = [
   'Zamień ostatni projekt w szablon do ponownego użycia.',
 ]
 
+const LIBRARY_EXAMPLES = {
+  'Gemini': [
+    { name: 'Pomysły na treści', cat: 'Tekst', prompt: 'Wygeneruj 10 pomysłów na posty Instagram dla [mój zawód]. Każdy pomysł w jednym zdaniu, praktyczny i angażujący.' },
+    { name: 'Email do klienta', cat: 'Tekst', prompt: 'Napisz profesjonalny email z podziękowaniem po zakończonej usłudze i prośbą o wystawienie opinii.' },
+    { name: 'Opis oferty', cat: 'Marketing', prompt: 'Napisz przekonujący opis mojej usługi [nazwa] na stronę www. Styl: ciepły, profesjonalny, 150 słów.' },
+  ],
+  'Canva AI': [
+    { name: 'Karuzela Instagram', cat: 'Grafika', prompt: 'Zaproponuj strukturę 8 slajdów karuzeli Instagram prezentującej portfolio [mój zawód].' },
+    { name: 'Post wizerunkowy', cat: 'Grafika', prompt: 'Napisz tekst do posta wizerunkowego z moją historią zawodową. Styl szczery, 3 akapity.' },
+    { name: 'Historia marki', cat: 'Marketing', prompt: 'Stwórz konspekt prezentacji "Moja historia jako [zawód]" na 6 slajdów z nagłówkami.' },
+  ],
+  'Notion AI': [
+    { name: 'Szablon projektu', cat: 'Organizacja', prompt: 'Stwórz szablon notatki projektowej dla nowego zlecenia: pola klienta, termin, zakres, linki, status.' },
+    { name: 'Checklist przed realizacją', cat: 'Organizacja', prompt: 'Napisz checklistę 15 rzeczy do sprawdzenia przed realizacją typowego zlecenia w mojej branży.' },
+    { name: 'Baza pomysłów', cat: 'Organizacja', prompt: 'Zaproponuj strukturę bazy wiedzy Notion dla freelancera: sekcje, widoki, właściwości.' },
+  ],
+  'Metricool': [
+    { name: 'Plan publikacji', cat: 'Marketing', prompt: 'Ułóż 7-dniowy plan publikacji social media dla [zawód] z jednym celem: więcej zapytań od klientów.' },
+    { name: 'Analiza zasięgów', cat: 'Research', prompt: 'Podaj 5 wskaźników, które powinienem śledzić w Metricool jako [zawód], i co każdy z nich oznacza.' },
+    { name: 'Hashtagi', cat: 'Marketing', prompt: 'Zaproponuj 20 hashtagów do postów Instagram dla [zawód] w Polsce, mieszanka niszowych i popularnych.' },
+  ],
+  'Trello + AI': [
+    { name: 'Tablica projektu', cat: 'Organizacja', prompt: 'Rozpisz tablicę Trello dla procesu od pierwszego zapytania klienta do finalnego dostarczenia usługi.' },
+    { name: 'Tygodniowy przegląd', cat: 'Organizacja', prompt: 'Stwórz szablon tygodniowego przeglądu zadań dla freelancera: 5 pytań do oceny tygodnia.' },
+    { name: 'Onboarding klienta', cat: 'Tekst', prompt: 'Napisz listę kroków onboardingu nowego klienta — od pierwszego kontaktu do startu realizacji.' },
+  ],
+  'Mailerlite AI': [
+    { name: 'Sekwencja powitalna', cat: 'Marketing', prompt: 'Napisz 3-mailową sekwencję powitalną dla nowych subskrybentów mojego newslettera jako [zawód].' },
+    { name: 'Email po usłudze', cat: 'Tekst', prompt: 'Napisz email wysyłany 7 dni po zakończeniu usługi: podzięk, pytanie o wrażenia, propozycja kolejnej współpracy.' },
+    { name: 'Oferta specjalna', cat: 'Marketing', prompt: 'Napisz email z limitowaną ofertą specjalną dla stałych klientów. Styl: ciepły, bez nachalnej sprzedaży.' },
+  ],
+  'Google Drive AI': [
+    { name: 'Struktura folderów', cat: 'Organizacja', prompt: 'Zaproponuj optymalną strukturę folderów Google Drive dla [zawód]: projekty, klienci, zasoby, archiwum.' },
+    { name: 'Nazewnictwo plików', cat: 'Organizacja', prompt: 'Stwórz system nazewnictwa plików dla [zawód] — daty, klienci, wersje — żeby łatwo szukać.' },
+    { name: 'Shared drive', cat: 'Produktywność', prompt: 'Jak skonfigurować Shared Drive do współpracy z klientem? Podaj 5 dobrych praktyk.' },
+  ],
+  'CapCut AI': [
+    { name: 'Scenariusz rolki', cat: 'Wideo', prompt: 'Ułóż scenariusz 30-sekundowej rolki pokazującej kulisy mojej pracy jako [zawód]. Hook + 3 sceny + CTA.' },
+    { name: 'Napisy do wideo', cat: 'Wideo', prompt: 'Napisz tekst do wideo "Dlaczego wybrałem zawód [zawód]" — styl szczery, 60 sekund mówienia.' },
+    { name: 'Pomysły na rolki', cat: 'Wideo', prompt: 'Podaj 10 pomysłów na rolki Instagram/TikTok dla [zawód], które angażują i budują markę osobistą.' },
+  ],
+  'Adobe Lightroom AI': [
+    { name: 'Preset workflow', cat: 'Grafika', prompt: 'Opisz workflow edycji zdjęć w Lightroom AI od importu do eksportu: jakie kroki, w jakiej kolejności.' },
+    { name: 'Styl wizualny', cat: 'Grafika', prompt: 'Pomóż mi opisać mój styl wizualny w 5 przymiotnikach i 3 zdaniach, które użyję w komunikacji marki.' },
+    { name: 'Eksport ustawienia', cat: 'Grafika', prompt: 'Jakie ustawienia eksportu z Lightroom stosować dla różnych celów: web, druk, social media, klient?' },
+  ],
+  'Remove.bg': [
+    { name: 'Kiedy używać', cat: 'Grafika', prompt: 'W jakich 5 sytuacjach usuwanie tła jest niezbędne w pracy [zawód]? Podaj konkretne przykłady.' },
+    { name: 'Workflow produktowy', cat: 'Grafika', prompt: 'Opisz krok po kroku jak przygotować zdjęcia produktowe do sklepu online z użyciem Remove.bg.' },
+    { name: 'Portfolio miniatura', cat: 'Grafika', prompt: 'Jak tworzyć spójne miniatury portfolio używając usuniętego tła? Podaj wytyczne stylistyczne.' },
+  ],
+}
+
 // ─── Helpery ──────────────────────────────────────────────────────────────────
 
 function buildPromptUrl(tool) {
@@ -386,6 +439,7 @@ function App() {
   const [userName, setUserName] = useState(() => window.localStorage.getItem('user_name') || '')
   const [profileOpen, setProfileOpen] = useState(false)
   const fileInputRef = useRef(null)
+  const promptImportRef = useRef(null)
 
   // Biblioteka – wyszukiwanie i filtrowanie
   const [librarySearch, setLibrarySearch] = useState('')
@@ -624,6 +678,64 @@ function App() {
       function() { showToast('Prompt skopiowany!') },
       function() { showToast('Nie można skopiować.') }
     )
+  }
+
+  function savePromptQuick(name, prompt, model, cat) {
+    if (!prompt) return
+    const entry = {
+      id: Date.now().toString(),
+      name: name || prompt.slice(0, 40),
+      model: model || '',
+      category: cat || '',
+      prompt: prompt,
+    }
+    const next = [entry, ...savedPrompts]
+    setSavedPrompts(next)
+    window.localStorage.setItem('saved_prompts', JSON.stringify(next))
+    showToast('Prompt zapisany: ' + entry.name)
+  }
+
+  function clearHistory() {
+    setHistory([])
+    window.localStorage.removeItem('ai_stack_history')
+    showToast('Historia wyczyszczona.')
+  }
+
+  function exportPrompts() {
+    if (!savedPrompts.length) { showToast('Brak promptów do eksportu.'); return }
+    const data = { version: 1, exportedAt: new Date().toISOString(), prompts: savedPrompts }
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = 'ai-prompty-' + Date.now() + '.json'
+    a.click()
+    URL.revokeObjectURL(a.href)
+    showToast('Wyeksportowano ' + savedPrompts.length + ' promptów.')
+  }
+
+  function importPrompts(file) {
+    const reader = new FileReader()
+    reader.onload = function(e) {
+      try {
+        const data = JSON.parse(e.target.result)
+        const list = Array.isArray(data.prompts) ? data.prompts : (Array.isArray(data) ? data : null)
+        if (!list || !list.length) { showToast('Nieprawidłowy plik — brak promptów.'); return }
+        const valid = list.filter(function(p) { return p.name && p.prompt })
+        const next = [...valid.map(function(p) {
+          return { id: p.id || Date.now().toString() + Math.random(), name: p.name, model: p.model || '', category: p.category || '', prompt: p.prompt }
+        }), ...savedPrompts]
+        setSavedPrompts(next)
+        window.localStorage.setItem('saved_prompts', JSON.stringify(next))
+        showToast('Zaimportowano ' + valid.length + ' promptów.')
+      } catch { showToast('Błąd odczytu pliku JSON.') }
+    }
+    reader.readAsText(file)
+  }
+
+  function resetAllData() {
+    const keys = ['ai_stack','ai_stack_history','saved_prompts','ai_projects','completed_lessons','done_inspirations','user_name']
+    keys.forEach(function(k) { window.localStorage.removeItem(k) })
+    window.location.reload()
   }
 
   function toggleLesson(lessonId) {
@@ -1001,7 +1113,17 @@ function App() {
   function renderHistory() {
     return (
       <section className="view-panel">
-        <h2>Historia generowania</h2>
+        <div className="panel-heading">
+          <div>
+            <h2>Historia generowania</h2>
+            <p>{history.length} wpisów</p>
+          </div>
+          {history.length > 0 && (
+            <button type="button" className="btn-danger-ghost" onClick={clearHistory}>
+              <Trash2 size={15} /> Wyczyść historię
+            </button>
+          )}
+        </div>
         <div className="list-panel">
           {history.length ? (
             history.map((item) => (
@@ -1015,7 +1137,7 @@ function App() {
               </article>
             ))
           ) : (
-            <p>Brak historii. Wygeneruj pierwszy stack z dashboardu.</p>
+            <p className="empty-hint">Brak historii. Wygeneruj pierwszy stack z dashboardu.</p>
           )}
         </div>
       </section>
@@ -1033,14 +1155,18 @@ function App() {
             <h2>Zapisane prompty</h2>
             <p>{savedPrompts.length} zapisanych promptów</p>
           </div>
-          <button
-            type="button"
-            className="btn-add-prompt"
-            onClick={() => setPromptFormOpen(function(v) { return !v })}
-          >
-            <Plus size={16} />
-            {promptFormOpen ? 'Anuluj' : 'Nowy prompt'}
-          </button>
+          <div className="prompt-header-actions">
+            <button type="button" className="btn-add-prompt" onClick={() => setPromptFormOpen(function(v) { return !v })}>
+              <Plus size={16} /> {promptFormOpen ? 'Anuluj' : 'Nowy prompt'}
+            </button>
+            <button type="button" className="btn-export-prompts" onClick={exportPrompts}>
+              <Download size={15} /> Eksportuj
+            </button>
+            <button type="button" className="btn-export-prompts" onClick={function() { promptImportRef.current && promptImportRef.current.click() }}>
+              <Save size={15} /> Importuj
+            </button>
+            <input ref={promptImportRef} type="file" accept=".json" style={{display:'none'}} onChange={function(e){ if(e.target.files&&e.target.files[0]){importPrompts(e.target.files[0]);e.target.value=''} }} />
+          </div>
         </div>
 
         {promptFormOpen && (
@@ -1198,16 +1324,42 @@ function App() {
 
         <div className="item-grid">
           {filteredLibrary.length ? (
-            filteredLibrary.map((tool) => (
-              <article className="item-card" key={tool.name}>
-                <strong>{tool.name}</strong>
-                <p>{tool.value}</p>
-                <span>{tool.category}</span>
-                <a className="tool-link" href={tool.url} target="_blank" rel="noreferrer">
-                  Otwórz narzędzie <ExternalLink size={12} />
-                </a>
-              </article>
-            ))
+            filteredLibrary.map(function(tool) {
+              const examples = LIBRARY_EXAMPLES[tool.name] || []
+              return (
+                <article className="item-card lib-card" key={tool.name}>
+                  <div className="lib-card-top">
+                    <strong>{tool.name}</strong>
+                    <span>{tool.category}</span>
+                  </div>
+                  <p>{tool.value}</p>
+                  {examples.length > 0 && (
+                    <div className="lib-prompts">
+                      <span className="lib-prompts-label">Przykładowe prompty:</span>
+                      {examples.map(function(ex, i) {
+                        return (
+                          <div key={i} className="lib-prompt-row">
+                            <span className="lib-prompt-name">{ex.name}</span>
+                            <p className="lib-prompt-text">{ex.prompt}</p>
+                            <div className="lib-prompt-actions">
+                              <button type="button" className="lib-btn-copy" onClick={function(){ copyPromptText(ex.prompt) }}>
+                                <Copy size={12} /> Kopiuj
+                              </button>
+                              <button type="button" className="lib-btn-save" onClick={function(){ savePromptQuick(ex.name + ' — ' + tool.name, ex.prompt, tool.name, ex.cat) }}>
+                                <Save size={12} /> Zapisz
+                              </button>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                  <a className="tool-link" href={tool.url} target="_blank" rel="noreferrer">
+                    Otwórz narzędzie <ExternalLink size={12} />
+                  </a>
+                </article>
+              )
+            })
           ) : (
             <p>Brak wyników dla podanych filtrów.</p>
           )}
@@ -1349,14 +1501,12 @@ function App() {
                                 <span>{lesson.task}</span>
                               </div>
                               <div className="training-lesson-actions">
-                                <a
-                                  href={lesson.url}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="training-btn-open"
-                                >
+                                <a href={lesson.url} target="_blank" rel="noreferrer" className="training-btn-open">
                                   <ExternalLink size={13} /> Otwórz narzędzie
                                 </a>
+                                <button type="button" className="training-btn-open" onClick={function() { savePromptQuick(lesson.title, lesson.task, tool.name, 'Tekst') }}>
+                                  <Save size={13} /> Zapisz prompt
+                                </button>
                                 <button
                                   type="button"
                                   className={'training-btn-done' + (isDone ? ' is-done' : '')}
@@ -1452,28 +1602,17 @@ function App() {
                       <p className="insp-prompt-text">{card.prompt}</p>
                     </div>
                     <div className="insp-actions">
-                      <button
-                        type="button"
-                        className="insp-btn-copy"
-                        onClick={function() { copyPromptText(card.prompt) }}
-                      >
+                      <button type="button" className="insp-btn-copy" onClick={function() { copyPromptText(card.prompt) }}>
                         <Copy size={13} /> Kopiuj prompt
                       </button>
-                      <a
-                        href={card.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="insp-btn-try"
-                      >
+                      <button type="button" className="insp-btn-copy" onClick={function() { savePromptQuick(card.title, card.prompt, card.tool, card.typeLabel) }}>
+                        <Save size={13} /> Zapisz prompt
+                      </button>
+                      <a href={card.url} target="_blank" rel="noreferrer" className="insp-btn-try">
                         <ExternalLink size={13} /> Wypróbuj
                       </a>
-                      <button
-                        type="button"
-                        className={'insp-btn-done' + (isDone ? ' is-done' : '')}
-                        onClick={function() { toggleInspiration(card.id) }}
-                      >
-                        <Check size={13} />
-                        {isDone ? 'Zrobione' : 'Oznacz jako zrobione'}
+                      <button type="button" className={'insp-btn-done' + (isDone ? ' is-done' : '')} onClick={function() { toggleInspiration(card.id) }}>
+                        <Check size={13} /> {isDone ? 'Zrobione' : 'Oznacz jako zrobione'}
                       </button>
                     </div>
                   </article>
@@ -1569,6 +1708,9 @@ function App() {
                   <label className="profile-label">Twoje imie</label>
                   <input className="profile-input" type="text" value={userName} placeholder="np. Jan Kowalski" onChange={function(e){ setUserName(e.target.value); window.localStorage.setItem('user_name', e.target.value) }} />
                   <button className="ghost profile-close" type="button" onClick={function(){ setProfileOpen(false) }}>Zamknij</button>
+                  <button className="btn-danger-ghost profile-reset" type="button" onClick={function(){ if(window.confirm('Usunąć wszystkie dane aplikacji?')) resetAllData() }}>
+                    <Trash2 size={13} /> Resetuj wszystkie dane
+                  </button>
                 </div>
               )}
             </div>
