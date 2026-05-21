@@ -397,7 +397,7 @@ function App() {
   const [goal, setGoal] = useState(profession.goal)
   const [toolsText, setToolsText] = useState(profession.tools.join(', '))
   const [problem, setProblem] = useState(profession.problem)
-  const [stack, setStack] = useState(() => getStoredValue('ai_stack', fallbackStack))
+  const [stack, setStack] = useState(() => getStoredValue('ai_stack', []))
   const [summary, setSummary] = useState({
     weeklyHours: '8-12 h',
     productivity: '+45%',
@@ -417,11 +417,7 @@ function App() {
   const [newPromptModel, setNewPromptModel] = useState('')
   const [newPromptCat, setNewPromptCat] = useState('')
   const [newPromptText, setNewPromptText] = useState('')
-  const [projects, setProjects] = useState(() =>
-    getStoredValue('ai_projects', [
-      { id: 1, name: 'Pierwszy AI Stack', profession: 'Fotograf', status: 'W trakcie' },
-    ]),
-  )
+  const [projects, setProjects] = useState(() => getStoredValue('ai_projects', []))
   const [projectName, setProjectName] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [geminiApiKey, setGeminiApiKey] = useState(
