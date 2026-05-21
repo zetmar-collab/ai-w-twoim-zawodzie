@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
-import { existsSync } from 'fs'
+import { existsSync, readFileSync } from 'fs'
 import { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
 import { GoogleGenAI } from '@google/genai'
@@ -219,6 +219,18 @@ app.get('/api/health', (_req, res) => {
   const envApiKey =
     typeof process.env.GEMINI_API_KEY === 'string' ? process.env.GEMINI_API_KEY.trim() : ''
   res.json({ ok: true, geminiConfigured: isUsableApiKey(envApiKey) })
+})
+
+// Unikalny identyfikator instalacji — tworzony przez install-windows.cmd
+// Pozwala aplikacji wykryć nową instalację i wyczyścić stare dane
+app.get('/api/install-id', (_req, res) => {
+  const idFile = join(__dirname, 'install_id.txt')
+  try {
+    const id = existsSync(idFile) ? readFileSync(idFile, 'utf8').trim() : 'dev'
+    res.json({ installId: id })
+  } catch {
+    res.json({ installId: 'dev' })
+  }
 })
 
 // Serve Vite production build when dist/ exists (npm start / production)

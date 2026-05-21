@@ -406,7 +406,7 @@ function App() {
   })
   const [history, setHistory] = useState(() => getStoredValue('ai_stack_history', []))
   const [savedPrompts, setSavedPrompts] = useState(() => getStoredValue('saved_prompts', []))
-  const [promptFormOpen, setPromptFormOpen] = useState(false)
+  const [promptFormOpen, setPromptFormOpen] = useState(true)
   const [completedLessons, setCompletedLessons] = useState(() => getStoredValue('completed_lessons', []))
   const [trainingFilter, setTrainingFilter] = useState('all')
   const [expandedTool, setExpandedTool] = useState(null)
@@ -440,6 +440,33 @@ function App() {
   const [profileOpen, setProfileOpen] = useState(false)
   const fileInputRef = useRef(null)
   const promptImportRef = useRef(null)
+
+  // Sprawdź install_id — czyści dane przy nowej instalacji
+  useEffect(() => {
+    async function checkInstallId() {
+      try {
+        const res = await fetch('/api/install-id')
+        const data = await res.json()
+        const newId = data.installId || 'dev'
+        if (newId === 'dev') return
+        const storedId = window.localStorage.getItem('app_install_id')
+        if (storedId && storedId !== newId) {
+          const keysToKeep = ['app_install_id', 'gemini_api_key']
+          const toRemove = []
+          for (let i = 0; i < window.localStorage.length; i++) {
+            const k = window.localStorage.key(i)
+            if (k && !keysToKeep.includes(k)) toRemove.push(k)
+          }
+          toRemove.forEach(function(k) { window.localStorage.removeItem(k) })
+          window.location.reload()
+        }
+        if (!storedId || storedId !== newId) {
+          window.localStorage.setItem('app_install_id', newId)
+        }
+      } catch { /* tryb dev lub brak pliku */ }
+    }
+    checkInstallId()
+  }, [])
 
   // Biblioteka – wyszukiwanie i filtrowanie
   const [librarySearch, setLibrarySearch] = useState('')
@@ -733,7 +760,7 @@ function App() {
   }
 
   function resetAllData() {
-    const keys = ['ai_stack','ai_stack_history','saved_prompts','ai_projects','completed_lessons','done_inspirations','user_name']
+    const keys = ['ai_stack','ai_stack_history','saved_prompts','ai_projects','completed_lessons','done_inspirations','user_name','app_install_id']
     keys.forEach(function(k) { window.localStorage.removeItem(k) })
     window.location.reload()
   }

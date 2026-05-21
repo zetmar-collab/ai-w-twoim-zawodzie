@@ -22,7 +22,7 @@ if not exist "%APP_DIR%\package.json" (
 )
 
 :: KROK 1: Sprawdz Node.js
-echo  [1/4]  Sprawdzam Node.js...
+echo  [1/5]  Sprawdzam Node.js...
 where node >nul 2>&1
 if errorlevel 1 (
   echo.
@@ -41,7 +41,7 @@ echo  OK - Node.js !NODE_VER! znaleziony.
 
 :: KROK 2: npm install
 echo.
-echo  [2/4]  Instaluje zaleznosci npm...
+echo  [2/5]  Instaluje zaleznosci npm...
 pushd "%APP_DIR%"
 call npm install --loglevel=error
 if errorlevel 1 (
@@ -54,9 +54,16 @@ if errorlevel 1 (
 popd
 echo  OK - zaleznosci zainstalowane.
 
-:: KROK 3: Stworz launcher start.cmd
+:: KROK 3: Generuj unikalny install_id (czysci dane przy nowej instalacji)
 echo.
-echo  [3/4]  Tworze plik startowy...
+echo  [3/5]  Generuje identyfikator instalacji...
+for /f %%G in ('powershell -nologo -noprofile -command "[guid]::NewGuid().ToString()"') do set INSTALL_ID=%%G
+echo %INSTALL_ID%> "%APP_DIR%\server\install_id.txt"
+echo  OK - install_id: !INSTALL_ID!
+
+:: KROK 4: Stworz launcher start.cmd
+echo.
+echo  [4/5]  Tworze plik startowy...
 set "LAUNCHER=%APP_DIR%\start.cmd"
 (
   echo @echo off
@@ -79,14 +86,18 @@ set "LAUNCHER=%APP_DIR%\start.cmd"
 ) > "%LAUNCHER%"
 echo  OK - plik startowy gotowy.
 
-:: KROK 4: Skrot na pulpicie
+:: KROK 5: Skrot na pulpicie z ikona
 echo.
-echo  [4/4]  Tworze skrot na pulpicie...
+echo  [5/5]  Tworze skrot na pulpicie...
 
 set "DESKTOP=%USERPROFILE%\Desktop"
 if not exist "%DESKTOP%" set "DESKTOP=%USERPROFILE%\Pulpit"
 set "LNK=%DESKTOP%\AI w Twoim Zawodzie.lnk"
 set "VBS=%TEMP%\mk_sc.vbs"
+
+:: Wybierz ikone - sprawdz dostepnosc
+set "ICON_PATH=%WINDIR%\system32\imageres.dll"
+set "ICON_IDX=109"
 
 (
   echo Set ws = CreateObject("WScript.Shell"^)
@@ -95,7 +106,7 @@ set "VBS=%TEMP%\mk_sc.vbs"
   echo sc.WorkingDirectory = "%APP_DIR%"
   echo sc.WindowStyle = 1
   echo sc.Description = "AI w Twoim Zawodzie"
-  echo sc.IconLocation = "%SystemRoot%\system32\imageres.dll, 97"
+  echo sc.IconLocation = "%ICON_PATH%,%ICON_IDX%"
   echo sc.Save
 ) > "%VBS%"
 

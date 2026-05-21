@@ -6,320 +6,205 @@
   <title>AI w Twoim Zawodzie – Uruchom aplikację</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --teal:       #0ea172;
-      --teal-dark:  #086b58;
-      --teal-light: #e1f5ea;
-      --bg:         #f4f6f8;
-      --surface:    #ffffff;
-      --text:       #1a2230;
-      --muted:      #6b7280;
-      --border:     #d1d5db;
-      --radius:     14px;
-      --shadow:     0 4px 24px rgba(8,107,88,0.10);
+      --teal: #0ea172; --teal-dark: #086b58; --teal-light: #e1f5ea;
+      --bg: #f4f6f8; --surface: #ffffff; --text: #1a2230;
+      --muted: #6b7280; --border: #d1d5db; --radius: 14px;
+      --shadow: 0 4px 24px rgba(8,107,88,0.10);
     }
-
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      background: var(--bg); color: var(--text); min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center;
       padding: 40px 20px 60px;
     }
-
-    /* ── Header ── */
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 8px;
-    }
+    .logo { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
     .logo-icon {
       width: 48px; height: 48px;
       background: linear-gradient(135deg, var(--teal), var(--teal-dark));
-      border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 24px;
+      border-radius: 12px; display: flex; align-items: center;
+      justify-content: center; font-size: 24px;
     }
     .logo-text { font-size: 22px; font-weight: 800; color: var(--teal-dark); }
-    .logo-sub  { font-size: 13px; color: var(--muted); margin-bottom: 32px; text-align: center; }
-
-    h1 {
-      font-size: 28px; font-weight: 800;
-      text-align: center; margin-bottom: 8px;
-      color: var(--text);
-    }
+    .logo-sub { font-size: 13px; color: var(--muted); margin-bottom: 32px; text-align: center; }
+    h1 { font-size: 28px; font-weight: 800; text-align: center; margin-bottom: 8px; }
     .subtitle {
-      font-size: 16px; color: var(--muted);
-      text-align: center; margin-bottom: 40px;
-      max-width: 520px;
+      font-size: 16px; color: var(--muted); text-align: center;
+      margin-bottom: 40px; max-width: 520px;
     }
-
-    /* ── OS Picker ── */
-    .os-picker {
-      display: flex; gap: 16px; flex-wrap: wrap;
-      justify-content: center; margin-bottom: 40px;
-    }
+    .os-picker { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-bottom: 40px; }
     .os-btn {
-      display: flex; flex-direction: column; align-items: center;
-      gap: 10px; padding: 24px 32px;
-      background: var(--surface);
-      border: 2px solid var(--border);
-      border-radius: var(--radius);
-      cursor: pointer;
-      transition: all 0.18s ease;
-      box-shadow: var(--shadow);
-      min-width: 148px;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      padding: 24px 32px; background: var(--surface); border: 2px solid var(--border);
+      border-radius: var(--radius); cursor: pointer; transition: all 0.18s ease;
+      box-shadow: var(--shadow); min-width: 148px;
     }
-    .os-btn:hover {
-      border-color: var(--teal);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 32px rgba(8,107,88,0.16);
-    }
-    .os-btn.active {
-      border-color: var(--teal);
-      background: var(--teal-light);
-      box-shadow: 0 8px 32px rgba(8,107,88,0.20);
-    }
+    .os-btn:hover { border-color: var(--teal); transform: translateY(-3px); box-shadow: 0 8px 32px rgba(8,107,88,0.16); }
+    .os-btn.active { border-color: var(--teal); background: var(--teal-light); box-shadow: 0 8px 32px rgba(8,107,88,0.20); }
     .os-btn.active .os-label { color: var(--teal-dark); }
     .os-emoji { font-size: 40px; line-height: 1; }
     .os-label { font-size: 15px; font-weight: 700; color: var(--text); }
     .os-badge {
       font-size: 10px; font-weight: 700; letter-spacing: 0.05em;
-      text-transform: uppercase; color: var(--teal-dark);
-      background: var(--teal-light); border-radius: 999px;
-      padding: 2px 8px;
+      text-transform: uppercase; color: var(--teal-dark); background: var(--teal-light);
+      border-radius: 999px; padding: 2px 8px;
     }
-
-    /* ── Instruction Card ── */
     .card {
-      background: var(--surface);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 32px 36px;
-      max-width: 620px; width: 100%;
+      background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow);
+      padding: 32px 36px; max-width: 620px; width: 100%;
     }
-    .card h2 {
-      font-size: 18px; font-weight: 800;
-      color: var(--teal-dark); margin-bottom: 24px;
-      display: flex; align-items: center; gap: 10px;
-    }
+    .card h2 { font-size: 18px; font-weight: 800; color: var(--teal-dark); margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
     .steps { display: flex; flex-direction: column; gap: 18px; }
-    .step {
-      display: flex; align-items: flex-start; gap: 14px;
-    }
+    .step { display: flex; align-items: flex-start; gap: 14px; }
     .step-num {
-      width: 30px; height: 30px; flex-shrink: 0;
-      background: var(--teal);
-      color: #fff; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px; font-weight: 800;
+      width: 30px; height: 30px; flex-shrink: 0; background: var(--teal);
+      color: #fff; border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; font-size: 13px; font-weight: 800;
     }
     .step-body { flex: 1; }
     .step-title { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
-    .step-desc  { font-size: 13px; color: var(--muted); line-height: 1.5; }
+    .step-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
     .step-code {
       display: inline-block; margin-top: 6px;
-      font-family: 'Courier New', monospace;
-      font-size: 12px;
-      background: #1a2230; color: #7effd4;
-      border-radius: 6px; padding: 6px 10px;
-      word-break: break-all;
+      font-family: 'Courier New', monospace; font-size: 12px;
+      background: #1a2230; color: #7effd4; border-radius: 6px;
+      padding: 6px 10px; word-break: break-all;
     }
-
-    /* ── Note ── */
     .note {
-      margin-top: 24px;
-      background: #fff8e1; border: 1px solid #f0c040;
-      border-radius: 10px; padding: 14px 18px;
-      font-size: 13px; color: #7a5c00;
-      line-height: 1.6;
-      display: flex; gap: 10px; align-items: flex-start;
+      margin-top: 24px; background: #fff8e1; border: 1px solid #f0c040;
+      border-radius: 10px; padding: 14px 18px; font-size: 13px; color: #7a5c00;
+      line-height: 1.6; display: flex; gap: 10px; align-items: flex-start;
     }
     .note-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
-
-    /* ── Footer ── */
-    footer {
-      margin-top: 48px; font-size: 12px; color: var(--muted);
-      text-align: center;
-    }
+    footer { margin-top: 48px; font-size: 12px; color: var(--muted); text-align: center; }
     footer a { color: var(--teal-dark); text-decoration: none; }
     footer a:hover { text-decoration: underline; }
-
-    /* ── Hidden panels ── */
     .panel { display: none; }
     .panel.visible { display: block; }
   </style>
 </head>
 <body>
 
-  <!-- Logo -->
   <div class="logo">
-    <div class="logo-icon">🤖</div>
+    <div class="logo-icon">&#x1F916;</div>
     <span class="logo-text">AI w Twoim Zawodzie</span>
   </div>
-  <div class="logo-sub">by Cyfrowy Przyjaciel · Marek Zettel</div>
+  <div class="logo-sub">by Cyfrowy Przyjaciel &middot; Marek Zettel</div>
 
   <h1>Witaj! Zacznijmy od instalacji.</h1>
   <p class="subtitle">
-    Wybierz swój system operacyjny — przeprowadzimy Cię krok po kroku.
+    Wybierz swój system operacyjny &mdash; przeprowadzimy Cię krok po kroku.
     Cały proces zajmie maksymalnie 2 minuty.
   </p>
 
-  <!-- OS Picker -->
   <div class="os-picker">
     <button class="os-btn" id="btn-win" onclick="selectOS('win')">
-      <span class="os-emoji">🪟</span>
+      <span class="os-emoji">&#x1FA9F;</span>
       <span class="os-label">Windows</span>
     </button>
     <button class="os-btn" id="btn-mac" onclick="selectOS('mac')">
-      <span class="os-emoji">🍎</span>
+      <span class="os-emoji">&#x1F34E;</span>
       <span class="os-label">macOS</span>
     </button>
     <button class="os-btn" id="btn-linux" onclick="selectOS('linux')">
-      <span class="os-emoji">🐧</span>
+      <span class="os-emoji">&#x1F427;</span>
       <span class="os-label">Linux</span>
     </button>
   </div>
 
-  <!-- Windows Instructions -->
+  <!-- Windows -->
   <div id="panel-win" class="panel">
     <div class="card">
-      <h2>🪟 Instalacja na Windows</h2>
+      <h2>&#x1FA9F; Instalacja na Windows</h2>
       <div class="steps">
         <div class="step">
           <div class="step-num">1</div>
           <div class="step-body">
             <div class="step-title">Uruchom instalator</div>
-            <div class="step-desc">
-              W tym samym folderze co ta strona znajdź plik
-              <strong>install-windows.cmd</strong> i kliknij na niego
-              <strong>dwukrotnie lewym przyciskiem myszy</strong>.
-            </div>
+            <div class="step-desc">W tym samym folderze znajdź plik <strong>install-windows.cmd</strong> i kliknij go <strong>dwukrotnie</strong>.</div>
           </div>
         </div>
         <div class="step">
           <div class="step-num">2</div>
           <div class="step-body">
             <div class="step-title">Zezwól na uruchomienie (jeśli Windows zapyta)</div>
-            <div class="step-desc">
-              Może pojawić się okno „Windows chronił Twój komputer". Kliknij
-              <strong>Więcej informacji</strong>, a następnie
-              <strong>Uruchom mimo to</strong>. To normalny komunikat dla nieznanych skryptów.
-            </div>
+            <div class="step-desc">Kliknij <strong>Więcej informacji</strong> &rarr; <strong>Uruchom mimo to</strong>. To normalny komunikat dla nieznanych skryptów.</div>
           </div>
         </div>
         <div class="step">
           <div class="step-num">3</div>
           <div class="step-body">
             <div class="step-title">Instalator pobiera Node.js (jeśli potrzeba)</div>
-            <div class="step-desc">
-              Jeśli Node.js nie jest zainstalowany, skrypt otworzy stronę
-              nodejs.org w przeglądarce. Pobierz i zainstaluj Node.js, a potem
-              uruchom instalator ponownie.
-            </div>
+            <div class="step-desc">Jeśli Node.js nie jest zainstalowany, skrypt otworzy nodejs.org. Zainstaluj i uruchom instalator ponownie.</div>
           </div>
         </div>
         <div class="step">
           <div class="step-num">4</div>
           <div class="step-body">
-            <div class="step-title">Instalacja zakończona — skrót na pulpicie</div>
-            <div class="step-desc">
-              Po chwili na pulpicie pojawi się ikona
-              <strong>AI w Twoim Zawodzie</strong>.
-              Kliknij ją dwukrotnie, żeby uruchomić aplikację.
-              Przeglądarka otworzy się automatycznie po 3 sekundach.
-            </div>
+            <div class="step-title">Gotowe &mdash; skrót na pulpicie</div>
+            <div class="step-desc">Na pulpicie pojawi się ikona <strong>AI w Twoim Zawodzie</strong>. Kliknij dwukrotnie &mdash; przeglądarka otworzy się automatycznie po 3 sekundach.</div>
           </div>
         </div>
       </div>
       <div class="note">
-        <span class="note-icon">💡</span>
-        <span>
-          Przy każdym uruchomieniu skrót startuje serwer w tle i automatycznie
-          otwiera aplikację w przeglądarce. Nie musisz niczego więcej robić.
-        </span>
+        <span class="note-icon">&#x1F4A1;</span>
+        <span>Przy każdym uruchomieniu skrót startuje serwer w tle i automatycznie otwiera aplikację w przeglądarce.</span>
       </div>
     </div>
   </div>
 
-  <!-- macOS Instructions -->
+  <!-- macOS -->
   <div id="panel-mac" class="panel">
     <div class="card">
-      <h2>🍎 Instalacja na macOS</h2>
+      <h2>&#x1F34E; Instalacja na macOS</h2>
       <div class="steps">
         <div class="step">
           <div class="step-num">1</div>
           <div class="step-body">
             <div class="step-title">Uruchom instalator</div>
-            <div class="step-desc">
-              W tym samym folderze co ta strona znajdź plik
-              <strong>install-mac.command</strong> i kliknij na niego
-              <strong>prawym przyciskiem myszy → Otwórz</strong>.
-            </div>
+            <div class="step-desc">W tym samym folderze znajdź plik <strong>install-mac.command</strong> i kliknij <strong>prawym przyciskiem myszy &rarr; Otwórz</strong>.</div>
           </div>
         </div>
         <div class="step">
           <div class="step-num">2</div>
           <div class="step-body">
-            <div class="step-title">Zezwól na uruchomienie (jeśli macOS zapyta)</div>
-            <div class="step-desc">
-              Może pojawić się okno „macOS nie może zweryfikować…". Kliknij
-              <strong>Otwórz</strong>. To normalny komunikat dla plików
-              pobranych z internetu.
-            </div>
+            <div class="step-title">Zezwól na uruchomienie</div>
+            <div class="step-desc">Kliknij <strong>Otwórz</strong> w oknie ostrzeżenia. Normalny komunikat dla pobranych plików.</div>
           </div>
         </div>
         <div class="step">
           <div class="step-num">3</div>
           <div class="step-body">
             <div class="step-title">Instalator pobiera Node.js (jeśli potrzeba)</div>
-            <div class="step-desc">
-              Jeśli brakuje Node.js, skrypt otworzy stronę nodejs.org.
-              Pobierz pakiet .pkg, zainstaluj, a następnie uruchom instalator ponownie.
-            </div>
+            <div class="step-desc">Skrypt otworzy nodejs.org jeśli brakuje Node.js. Pobierz pakiet .pkg, zainstaluj i uruchom instalator ponownie.</div>
           </div>
         </div>
         <div class="step">
           <div class="step-num">4</div>
           <div class="step-body">
-            <div class="step-title">Aplikacja pojawi się w Docku / na biurku</div>
-            <div class="step-desc">
-              Po zakończeniu instalacji na biurku (lub w folderze
-              <strong>~/Desktop</strong>) znajdziesz ikonę
-              <strong>AI w Twoim Zawodzie</strong>.
-              Kliknij dwukrotnie — przeglądarka otworzy się automatycznie.
-            </div>
+            <div class="step-title">Ikona na pulpicie</div>
+            <div class="step-desc">Na pulpicie pojawi się <strong>AI w Twoim Zawodzie</strong>. Kliknij dwukrotnie &mdash; przeglądarka otworzy się automatycznie.</div>
           </div>
         </div>
       </div>
       <div class="note">
-        <span class="note-icon">💡</span>
-        <span>
-          Jeśli pojawi się komunikat o braku uprawnień do pliku .command,
-          otwórz Terminal i wpisz:<br>
-          <code class="step-code">chmod +x ~/Desktop/AI\ w\ Twoim\ Zawodzie/install-mac.command</code>
-        </span>
+        <span class="note-icon">&#x1F4A1;</span>
+        <span>Jeśli pojawi się błąd uprawnień, otwórz Terminal i wpisz:<br>
+        <code class="step-code">chmod +x install-mac.command &amp;&amp; ./install-mac.command</code></span>
       </div>
     </div>
   </div>
 
-  <!-- Linux Instructions -->
+  <!-- Linux -->
   <div id="panel-linux" class="panel">
     <div class="card">
-      <h2>🐧 Instalacja na Linux</h2>
+      <h2>&#x1F427; Instalacja na Linux</h2>
       <div class="steps">
         <div class="step">
           <div class="step-num">1</div>
           <div class="step-body">
-            <div class="step-title">Nadaj uprawnienia i uruchom instalator</div>
-            <div class="step-desc">
-              Otwórz terminal w folderze z aplikacją i wpisz:
-            </div>
+            <div class="step-title">Otwórz terminal i uruchom instalator</div>
+            <div class="step-desc">Przejdź do folderu z aplikacją i wpisz:</div>
             <code class="step-code">chmod +x install-linux.sh &amp;&amp; ./install-linux.sh</code>
           </div>
         </div>
@@ -327,101 +212,79 @@
           <div class="step-num">2</div>
           <div class="step-body">
             <div class="step-title">Instalacja Node.js (jeśli potrzeba)</div>
-            <div class="step-desc">
-              Skrypt sprawdzi czy Node.js jest zainstalowany i wyświetli
-              odpowiednie polecenie dla Twojej dystrybucji (Ubuntu, Fedora, Arch…).
-            </div>
+            <div class="step-desc">Skrypt wyświetli odpowiednie polecenie dla Twojej dystrybucji (Ubuntu, Fedora, Arch...).</div>
           </div>
         </div>
         <div class="step">
           <div class="step-num">3</div>
           <div class="step-body">
             <div class="step-title">Skrót na pulpicie</div>
-            <div class="step-desc">
-              Po instalacji na pulpicie pojawi się plik
-              <strong>AI-w-Twoim-Zawodzie.desktop</strong>.
-              Kliknij dwukrotnie (lub prawym → Uruchom), żeby otworzyć aplikację.
-            </div>
+            <div class="step-desc">Na pulpicie pojawi się plik <strong>AI-w-Twoim-Zawodzie.desktop</strong>. Kliknij dwukrotnie (lub Uruchom).</div>
           </div>
         </div>
         <div class="step">
           <div class="step-num">4</div>
           <div class="step-body">
             <div class="step-title">Aplikacja otwiera się w przeglądarce</div>
-            <div class="step-desc">
-              Serwer startuje w tle, a przeglądarka otwiera
-              <strong>http://localhost:8787</strong> po 3 sekundach.
-            </div>
+            <div class="step-desc">Serwer startuje w tle, przeglądarka otwiera <strong>http://localhost:8787</strong> po 3 sekundach.</div>
           </div>
         </div>
       </div>
       <div class="note">
-        <span class="note-icon">💡</span>
-        <span>
-          Na niektórych środowiskach GNOME/KDE skrót .desktop trzeba najpierw
-          „zaufać" — kliknij prawym przyciskiem myszy na ikonę i wybierz
-          <strong>Zezwól na uruchamianie</strong> / <strong>Trust</strong>.
-        </span>
+        <span class="note-icon">&#x1F4A1;</span>
+        <span>Na GNOME/KDE może być konieczne kliknięcie prawym przyciskiem na ikonę i wybranie <strong>Zezwól na uruchamianie</strong>.</span>
       </div>
     </div>
   </div>
 
   <footer>
     Masz pytania?
-    <a href="https://github.com/zetmar-collab/ai-w-twoim-zawodzie/issues" target="_blank">Zgłoś problem na GitHub</a>
-    &nbsp;·&nbsp;
+    <a href="https://github.com/zetmar-collab/ai-w-twoim-zawodzie/issues" target="_blank">Zgłoś na GitHub</a>
+    &nbsp;&middot;&nbsp;
     <a href="https://github.com/zetmar-collab/ai-w-twoim-zawodzie" target="_blank">github.com/zetmar-collab</a>
-    &nbsp;·&nbsp;
-    AI w Twoim Zawodzie © 2025
+    &nbsp;&middot;&nbsp; AI w Twoim Zawodzie &copy; 2025
   </footer>
 
   <script>
-    // Auto-detect OS and highlight the matching button
     function detectOS() {
-      const ua = navigator.userAgent || navigator.platform || ''
-      if (/Win/i.test(ua))                         return 'win'
-      if (/Mac/i.test(ua) && !/iPhone|iPad/.test(ua)) return 'mac'
-      if (/Linux/i.test(ua))                       return 'linux'
-      return null
+      var ua = navigator.userAgent || '';
+      if (ua.indexOf('Win') !== -1) return 'win';
+      if (ua.indexOf('Mac') !== -1 && ua.indexOf('iPhone') === -1 && ua.indexOf('iPad') === -1) return 'mac';
+      if (ua.indexOf('Linux') !== -1) return 'linux';
+      return null;
     }
 
     function selectOS(os) {
-      // Remove active from all buttons
-      document.querySelectorAll('.os-btn').forEach(b => b.classList.remove('active'))
-      // Hide all panels
-      document.querySelectorAll('.panel').forEach(p => p.classList.remove('visible'))
+      var btns = document.querySelectorAll('.os-btn');
+      for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
 
-      // Activate chosen button and show badge if auto-detected
-      const btn = document.getElementById('btn-' + os)
-      if (btn) {
-        btn.classList.add('active')
-        // Remove any old badge
-        const old = btn.querySelector('.os-badge')
-        if (old) old.remove()
-      }
-      // Show panel
-      const panel = document.getElementById('panel-' + os)
+      var panels = document.querySelectorAll('.panel');
+      for (var i = 0; i < panels.length; i++) panels[i].classList.remove('visible');
+
+      var btn = document.getElementById('btn-' + os);
+      if (btn) btn.classList.add('active');
+
+      var panel = document.getElementById('panel-' + os);
       if (panel) {
-        panel.classList.add('visible')
-        // Smooth scroll to panel
-        setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80)
+        panel.classList.add('visible');
+        setTimeout(function() {
+          panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 80);
       }
     }
 
-    // On load — auto-detect and add badge
-    window.addEventListener('DOMContentLoaded', () => {
-      const os = detectOS()
-      if (os) {
-        selectOS(os)
-        const btn = document.getElementById('btn-' + os)
-        if (btn) {
-          const badge = document.createElement('span')
-          badge.className = 'os-badge'
-          badge.textContent = 'Twój system'
-          btn.appendChild(badge)
-        }
+    // Auto-detect on load
+    var detectedOS = detectOS();
+    if (detectedOS) {
+      selectOS(detectedOS);
+      var btn = document.getElementById('btn-' + detectedOS);
+      if (btn) {
+        var badge = document.createElement('span');
+        badge.className = 'os-badge';
+        badge.textContent = 'Twój system';
+        btn.appendChild(badge);
       }
-    })
+    }
   </script>
 </body>
 </html>
