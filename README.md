@@ -2,7 +2,7 @@
 
 > Darmowy, lokalny generator spersonalizowanego **AI Stack** — wpisz swój zawód, poziom i cele, a aplikacja (z pomocą Gemini AI) dobierze 8–10 konkretnych narzędzi z gotowymi promptami.
 
-![Wersja](https://img.shields.io/badge/wersja-1.0.0-brightgreen)
+![Wersja](https://img.shields.io/badge/wersja-1.2.0-brightgreen)
 ![Licencja](https://img.shields.io/badge/licencja-MIT-blue)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-green)
 
@@ -76,11 +76,19 @@ PORT=8787
 
 ### Budowanie paczki dystrybucyjnej
 
+**Windows (PowerShell):**
+
+```powershell
+powershell -ExecutionPolicy Bypass -File create-package.ps1
+```
+
+**macOS / Linux:**
+
 ```bash
 bash create-package.sh
 ```
 
-Skrypt zbuduje frontend, spakuje wszystko do `AI-w-Twoim-Zawodzie-v1.0.0.zip` gotowego do dystrybucji.
+Skrypt zbuduje frontend i utworzy `AI-w-Twoim-Zawodzie-v<wersja>.zip` gotowy do dystrybucji.
 
 ### Struktura projektu
 
@@ -110,9 +118,14 @@ ai-w-twoim-zawodzie/
 - 🤖 **Gemini 2.5 Flash** — zasilany najnowszym modelem Google AI
 - 🔒 **Tryb demo** — działa bez klucza API
 - 📋 **Gotowe prompty** — każde narzędzie ma prompt gotowy do wklejenia
-- 💾 **Historia i projekty** — zapisuj i zarządzaj wieloma stackami
-- 📤 **Eksport** — pobierz stack jako plik .txt
+- 💾 **Historia stacków** — porównanie dwóch wersji, wczytywanie z historii
+- 📂 **Domyślny profil** — zapis zawodu i problemu, auto-wczytywanie przy starcie
+- 📤 **Eksport stacka** — JSON, PDF (druk), szybki stack z dashboardu
+- 📋 **Prompty** — biblioteka z eksportem/importem JSON i **CSV (PrompBase)**
+- 📅 **Plan 7 dni** — tygodniowy plan wdrożenia stacka
+- 🌙 **Ciemny motyw** — zielona paleta, przełącznik w aplikacji
 - 🔍 **Biblioteka narzędzi** — przeglądaj i filtruj narzędzia AI
+- 💼 **Backup danych** — eksport/import całej aplikacji (JSON)
 - 🛡️ **Rate limiting** — 5 zapytań/minutę, sanityzacja wejścia
 - 🖥️ **Instalator one-click** — dedykowane skrypty dla Windows/macOS/Linux
 

@@ -6,7 +6,6 @@ import {
   ChevronUp,
   Clock,
   ExternalLink,
-  RefreshCcw,
   Sparkles,
 } from 'lucide-react'
 
@@ -195,11 +194,6 @@ const UNIVERSAL_LESSONS = [
 ]
 
 const STATUS_CYCLE = { not_started: 'in_progress', in_progress: 'completed', completed: 'not_started' }
-const STATUS_LABEL = {
-  not_started: 'Zacznij',
-  in_progress: 'Ukończ',
-  completed: 'Ukończono',
-}
 const STATUS_COLOR = {
   not_started: 'lesson-btn-start',
   in_progress: 'lesson-btn-progress',

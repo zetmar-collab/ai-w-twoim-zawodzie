@@ -1,7 +1,7 @@
 {
   "name": "ai-w-twoim-zawodzie",
   "private": false,
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Darmowy generator spersonalizowanego AI Stack - dopasuj narzedzia AI do swojego zawodu",
   "author": "Marek Zettel <https://github.com/zetmar-collab>",
   "license": "MIT",

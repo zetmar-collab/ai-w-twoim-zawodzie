@@ -1,4 +1,6 @@
 :root {
+  color-scheme: light;
+
   --bg: #eaf6ef;
   --surface: #fbfffc;
   --surface-soft: #f3fbf6;
@@ -8,18 +10,171 @@
   --text-muted: #64766d;
   --muted: #64766d;
   --border: #cfe2d6;
+
   --teal: #0aa486;
   --teal-dark: #086b58;
   --amber: #e89213;
   --accent: #0aa486;
+
+  --app-shell-gradient: linear-gradient(135deg, #e2f3e9 0%, #f3fbf6 45%, #d9efe5 100%);
+  --app-shell-glow: radial-gradient(circle at 16% 10%, rgba(255, 255, 255, 0.72), transparent 26%);
+  --sidebar-bg: rgba(248, 254, 250, 0.82);
+  --topbar-bg: rgba(251, 255, 252, 0.72);
+  --panel-bg: rgba(251, 255, 252, 0.94);
+  --panel-shadow: 0 18px 45px rgba(19, 81, 55, 0.08);
+
+  --brand-mark-bg: #ecfbf4;
+  --nav-text: #294038;
+  --nav-active-bg: #dff4e8;
+  --nav-active-text: #086b58;
+
+  --step-inactive-bg: #e2ede7;
+  --step-inactive-text: #66796e;
+  --status-chip-bg: #e9f8ef;
+  --status-chip-border: #c5e5d4;
+  --api-panel-bg: #edf8f1;
+  --api-panel-border: #c5e5d4;
+
+  --area-btn-text: #3a5147;
+  --area-selected-bg: #e1f5ea;
+
+  --primary-gradient: linear-gradient(135deg, #086b58, #00857f);
+  --ghost-hover-bg: #edf4ef;
+
+  --tool-index-bg: #eef0f0;
+  --tool-icon-bg: #e4f7ee;
+  --category-bg: #edf4ef;
+  --category-text: #5f7367;
+  --tool-link-border: #efb35f;
+  --tool-link-bg: #fffaf2;
+  --tool-link-text: #c36a00;
+
+  --metrics-border: #b8dfc8;
+  --metrics-bg: #e7f7ed;
+
+  --stack-action-hover: #edf4ef;
+  --stack-import-bg: #edf8f3;
+  --stack-import-hover: #d8f2e6;
+
+  --quick-bar-bg: linear-gradient(135deg, #ecfbf4 0%, #f8fefa 100%);
+  --quick-bar-border: #9fd4b8;
+
+  --badge-gemini-bg: #e8f8ef;
+  --badge-gemini-border: #9fd4b8;
+  --badge-gemini-text: #0d6b45;
+  --badge-demo-bg: #fff6e8;
+  --badge-demo-border: #f0d4a8;
+  --badge-demo-text: #8a5a12;
+
+  --toast-bg: #086b58;
+  --toast-shadow: 0 8px 28px rgba(8, 107, 88, 0.32);
+
+  --onboarding-backdrop: rgba(20, 40, 32, 0.45);
+  --onboarding-card-bg: #fff;
+
+  --profile-dropdown-bg: var(--surface);
+  --profile-dropdown-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+
+  --card-bg: rgba(255, 255, 255, 0.72);
+  --card-done-bg: #f3fbf6;
+  --insp-card-bg: #fff;
+  --insp-card-done-bg: #f5fbf7;
+  --highlight-bg: #f8fefa;
+  --highlight-border: var(--teal);
+
   font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   color: var(--text);
   background: var(--bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #0a100e;
+  --surface: #131f1a;
+  --surface-soft: #182820;
+  --surface-hover: #243830;
+  --text: #c5d9ce;
+  --text-strong: #ecfbf4;
+  --text-muted: #8aa89a;
+  --muted: #8aa89a;
+  --border: #2a4236;
+
+  --teal: #3ecf9e;
+  --teal-dark: #6eecc0;
+  --amber: #e8a84a;
+  --accent: #3ecf9e;
+
+  --app-shell-gradient: linear-gradient(145deg, #080d0b 0%, #0e1612 42%, #0a120f 100%);
+  --app-shell-glow: radial-gradient(circle at 14% 8%, rgba(62, 207, 158, 0.14), transparent 30%);
+  --sidebar-bg: rgba(12, 20, 16, 0.94);
+  --topbar-bg: rgba(14, 22, 18, 0.9);
+  --panel-bg: rgba(18, 28, 23, 0.97);
+  --panel-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+
+  --brand-mark-bg: #1a2e26;
+  --nav-text: #b6cfc4;
+  --nav-active-bg: #1e3329;
+  --nav-active-text: #6eecc0;
+
+  --step-inactive-bg: #1c2a24;
+  --step-inactive-text: #8aa89a;
+  --status-chip-bg: #1a2e26;
+  --status-chip-border: #2f4a3c;
+  --api-panel-bg: #15221c;
+  --api-panel-border: #2a4236;
+
+  --area-btn-text: #b6cfc4;
+  --area-selected-bg: #1e3329;
+
+  --primary-gradient: linear-gradient(135deg, #2a9d7a, #3ecf9e);
+  --ghost-hover-bg: #243830;
+
+  --tool-index-bg: #1c2a24;
+  --tool-icon-bg: #1e3329;
+  --category-bg: #1a2e26;
+  --category-text: #9eb8aa;
+  --tool-link-border: #5c4a28;
+  --tool-link-bg: #2a2418;
+  --tool-link-text: #e8b86a;
+
+  --metrics-border: #2a4236;
+  --metrics-bg: #15221c;
+
+  --stack-action-hover: #243830;
+  --stack-import-bg: #1a2e26;
+  --stack-import-hover: #243830;
+
+  --quick-bar-bg: linear-gradient(135deg, #15221c 0%, #1a2e26 100%);
+  --quick-bar-border: #3ecf9e;
+
+  --badge-gemini-bg: #15221c;
+  --badge-gemini-border: #3ecf9e;
+  --badge-gemini-text: #6eecc0;
+  --badge-demo-bg: #2a2418;
+  --badge-demo-border: #5c4a28;
+  --badge-demo-text: #e8b86a;
+
+  --toast-bg: #1e3329;
+  --toast-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+
+  --onboarding-backdrop: rgba(0, 0, 0, 0.65);
+  --onboarding-card-bg: #141f1a;
+
+  --profile-dropdown-bg: #141f1a;
+  --profile-dropdown-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+
+  --card-bg: rgba(19, 31, 26, 0.88);
+  --card-done-bg: #15221c;
+  --insp-card-bg: #141f1a;
+  --insp-card-done-bg: #15221c;
+  --highlight-bg: #15221c;
+  --highlight-border: #3ecf9e;
 }
 
 * {
@@ -29,6 +184,8 @@
 body {
   margin: 0;
   min-width: 320px;
+  background: var(--bg);
+  color: var(--text);
 }
 
 button,

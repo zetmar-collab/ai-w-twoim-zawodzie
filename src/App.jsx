@@ -1,9 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import {
-  Bell,
-  BookOpen,
   BriefcaseBusiness,
-  Camera,
   Check,
   ChevronDown,
   ChevronRight,
@@ -12,457 +9,150 @@ import {
   ExternalLink,
   FileText,
   GraduationCap,
-  Home,
   Loader2,
-  MessageSquareText,
-  PenLine,
+  Moon,
   Plus,
+  Sun,
   RefreshCcw,
   Save,
+  Zap,
   Search,
-  ShoppingCart,
   Sparkles,
   Target,
   Trash2,
-  UserRoundSearch,
   WandSparkles,
   X,
 } from 'lucide-react'
 import './App.css'
-
-// ─── Stałe promptów ──────────────────────────────────────────────────────────
-
-const BASE_AI_MODELS = [
-  'ChatGPT (GPT-4o)', 'ChatGPT (GPT-4)', 'Claude 3.5 Sonnet', 'Claude 3 Opus',
-  'Gemini 2.5 Flash', 'Gemini 2.0 Pro', 'Copilot', 'Perplexity',
-  'Midjourney', 'DALL-E 3', 'Stable Diffusion', 'Adobe Firefly',
-  'Canva AI', 'Runway ML', 'Suno AI', 'ElevenLabs', 'Notion AI',
-]
-
-const PROMPT_CATS = [
-  'Tekst', 'Grafika', 'Kod', 'Marketing', 'Research',
-  'Wideo', 'Audio', 'Organizacja', 'Sprzedaż', 'Inne',
-]
-
-// ─── Dane ─────────────────────────────────────────────────────────────────────
-
-const professions = [
-  {
-    id: 'fotograf',
-    label: 'Fotograf',
-    icon: Camera,
-    goal: 'Oszczędność czasu i automatyzacja',
-    defaults: ['Edycja zdjęć', 'Marketing i social media', 'Obsługa klienta'],
-    tools: ['Lightroom', 'Photoshop', 'Canva', 'Google Drive', 'Instagram'],
-    problem:
-      'Szybsza selekcja zdjęć, opisy sesji, oferty dla klientów i gotowe posty po realizacji.',
-  },
-  {
-    id: 'copywriter',
-    label: 'Copywriter',
-    icon: PenLine,
-    goal: 'Lepsze briefy i szybsze warianty tekstów',
-    defaults: ['Tworzenie treści', 'SEO', 'Analiza briefu'],
-    tools: ['Google Docs', 'Notion', 'Surfer SEO', 'LinkedIn'],
-    problem: 'Chcę szybciej przechodzić od briefu do gotowych wersji tekstu dla klienta.',
-  },
-  {
-    id: 'sklep',
-    label: 'Sklep / E-commerce',
-    icon: ShoppingCart,
-    goal: 'Opisy produktów i obsługa sprzedaży',
-    defaults: ['Opisy produktów', 'Obsługa klienta', 'Kampanie'],
-    tools: ['Shopify', 'WooCommerce', 'Baselinker', 'Allegro'],
-    problem: 'Potrzebuję opisów, odpowiedzi do klientów i pomysłów na kampanie sezonowe.',
-  },
-  {
-    id: 'nauczyciel',
-    label: 'Nauczyciel',
-    icon: BookOpen,
-    goal: 'Materiały lekcyjne i indywidualizacja',
-    defaults: ['Scenariusze lekcji', 'Quizy', 'Materiały dydaktyczne'],
-    tools: ['Canva', 'Google Classroom', 'Teams', 'YouTube'],
-    problem: 'Chcę tworzyć lepsze materiały i dostosowywać zadania do poziomu uczniów.',
-  },
-  {
-    id: 'hr',
-    label: 'HR / Rekruter',
-    icon: UserRoundSearch,
-    goal: 'Szybszy screening i komunikacja',
-    defaults: ['Rekrutacja', 'Komunikacja', 'Onboarding'],
-    tools: ['LinkedIn', 'ATS', 'Gmail', 'Google Sheets'],
-    problem: 'Potrzebuję uporządkować kandydatów i pisać trafniejsze wiadomości.',
-  },
-]
-
-const navItems = [
-  ['dashboard', 'Mój dashboard', Home],
-  ['stack', 'Mój stack AI', Sparkles],
-  ['projects', 'Moje projekty', BriefcaseBusiness],
-  ['history', 'Historia', FileText],
-  ['prompts', 'Zapisane prompty', Copy],
-  ['tools', 'Biblioteka narzędzi', BookOpen],
-  ['training', 'Szkolenia', GraduationCap],
-  ['inspiration', 'Inspiracje', WandSparkles],
-]
-
-const areas = [
-  'Edycja zdjęć',
-  'Marketing i social media',
-  'Obsługa klienta',
-  'Administracja',
-  'Tworzenie treści',
-  'SEO',
-  'Zarządzanie projektami',
-  'Analiza briefu',
-  'Quizy',
-  'Scenariusze lekcji',
-  'Materiały dydaktyczne',
-  'Rekrutacja',
-  'Komunikacja',
-  'Onboarding',
-  'Opisy produktów',
-  'Kampanie',
-]
-
-const fallbackStack = [
-  {
-    name: 'Gemini',
-    category: 'Asystent',
-    value: 'Pomysły na treści, opisy ofert i odpowiedzi do klientów.',
-    prompt:
-      'Jesteś praktycznym doradcą AI. Przygotuj 5 wariantów odpowiedzi do klienta, który pyta o cenę mojej usługi.',
-    url: 'https://gemini.google.com/',
-  },
-  {
-    name: 'Adobe Lightroom AI',
-    category: 'Edycja zdjęć',
-    value: 'Automatyczna selekcja, maski i pierwsze korekty zdjęć.',
-    prompt: 'Stwórz checklistę ustawień Lightroom AI dla reportażu rodzinnego.',
-    url: 'https://www.adobe.com/products/photoshop-lightroom.html',
-  },
-  {
-    name: 'Canva AI',
-    category: 'Grafika',
-    value: 'Szybkie posty, relacje i prezentacje po sesji.',
-    prompt: 'Zaproponuj 7 slajdów karuzeli Instagram po sesji wizerunkowej.',
-    url: 'https://www.canva.com/ai/',
-  },
-  {
-    name: 'Remove.bg',
-    category: 'Edycja zdjęć',
-    value: 'Usuwanie tła do miniatur, ofert i materiałów sprzedażowych.',
-    prompt: 'Przygotuj instrukcję, kiedy używać usuwania tła w ofercie fotografa.',
-    url: 'https://www.remove.bg/',
-  },
-  {
-    name: 'Metricool',
-    category: 'Social media',
-    value: 'Plan publikacji i analiza wyników postów.',
-    prompt: 'Ułóż tygodniowy plan postów dla fotografa ślubnego w Polsce.',
-    url: 'https://metricool.com/',
-  },
-  {
-    name: 'Google Drive AI',
-    category: 'Produktywność',
-    value: 'Porządkowanie plików, briefów i notatek z klientami.',
-    prompt: 'Zaproponuj strukturę folderów dla sesji zdjęciowych i komunikacji z klientem.',
-    url: 'https://workspace.google.com/',
-  },
-  {
-    name: 'Notion AI',
-    category: 'Organizacja',
-    value: 'Briefy, checklisty sesji i baza pomysłów na publikacje.',
-    prompt: 'Stwórz szablon notatki projektowej dla nowej sesji zdjęciowej.',
-    url: 'https://www.notion.com/product/ai',
-  },
-  {
-    name: 'CapCut AI',
-    category: 'Wideo',
-    value: 'Krótkie rolki z backstage, napisami i wariantami montażu.',
-    prompt: 'Ułóż scenariusz 30-sekundowej rolki z backstage sesji biznesowej.',
-    url: 'https://www.capcut.com/',
-  },
-  {
-    name: 'Trello + AI',
-    category: 'Zarządzanie',
-    value: 'Lista zadań od zapytania klienta po oddanie galerii.',
-    prompt: 'Rozpisz tablicę Trello dla procesu od zapytania do finalnego rezultatu.',
-    url: 'https://trello.com/',
-  },
-  {
-    name: 'Mailerlite AI',
-    category: 'Newsletter',
-    value: 'Sekwencje maili, oferty i przypomnienia dla stałych klientów.',
-    prompt: 'Napisz 3-mailową sekwencję dla klienta po odebraniu galerii zdjęć.',
-    url: 'https://www.mailerlite.com/',
-  },
-]
-
-const toolIcons = [MessageSquareText, Camera, WandSparkles, Search, FileText, Target]
-
-const learningItems = [
-  ['Start z Gemini', '15 minut', 'Jak pisać konkretne polecenia i poprawiać wynik.'],
-  ['Workflow tygodniowy', '25 minut', 'Jak zamienić powtarzalne zadania w checklisty AI.'],
-  ['Bezpieczne dane', '12 minut', 'Co wpisywać do AI, a czego lepiej nie wysyłać.'],
-]
-
-const inspirationItems = [
-  'Zrób mini-audyt jednego procesu, który zabiera Ci najwięcej czasu.',
-  'Poproś AI o 3 wersje odpowiedzi do klienta: ciepłą, konkretną i premium.',
-  'Zamień ostatni projekt w szablon do ponownego użycia.',
-]
-
-const LIBRARY_EXAMPLES = {
-  'Gemini': [
-    { name: 'Pomysły na treści', cat: 'Tekst', prompt: 'Wygeneruj 10 pomysłów na posty Instagram dla [mój zawód]. Każdy pomysł w jednym zdaniu, praktyczny i angażujący.' },
-    { name: 'Email do klienta', cat: 'Tekst', prompt: 'Napisz profesjonalny email z podziękowaniem po zakończonej usłudze i prośbą o wystawienie opinii.' },
-    { name: 'Opis oferty', cat: 'Marketing', prompt: 'Napisz przekonujący opis mojej usługi [nazwa] na stronę www. Styl: ciepły, profesjonalny, 150 słów.' },
-  ],
-  'Canva AI': [
-    { name: 'Karuzela Instagram', cat: 'Grafika', prompt: 'Zaproponuj strukturę 8 slajdów karuzeli Instagram prezentującej portfolio [mój zawód].' },
-    { name: 'Post wizerunkowy', cat: 'Grafika', prompt: 'Napisz tekst do posta wizerunkowego z moją historią zawodową. Styl szczery, 3 akapity.' },
-    { name: 'Historia marki', cat: 'Marketing', prompt: 'Stwórz konspekt prezentacji "Moja historia jako [zawód]" na 6 slajdów z nagłówkami.' },
-  ],
-  'Notion AI': [
-    { name: 'Szablon projektu', cat: 'Organizacja', prompt: 'Stwórz szablon notatki projektowej dla nowego zlecenia: pola klienta, termin, zakres, linki, status.' },
-    { name: 'Checklist przed realizacją', cat: 'Organizacja', prompt: 'Napisz checklistę 15 rzeczy do sprawdzenia przed realizacją typowego zlecenia w mojej branży.' },
-    { name: 'Baza pomysłów', cat: 'Organizacja', prompt: 'Zaproponuj strukturę bazy wiedzy Notion dla freelancera: sekcje, widoki, właściwości.' },
-  ],
-  'Metricool': [
-    { name: 'Plan publikacji', cat: 'Marketing', prompt: 'Ułóż 7-dniowy plan publikacji social media dla [zawód] z jednym celem: więcej zapytań od klientów.' },
-    { name: 'Analiza zasięgów', cat: 'Research', prompt: 'Podaj 5 wskaźników, które powinienem śledzić w Metricool jako [zawód], i co każdy z nich oznacza.' },
-    { name: 'Hashtagi', cat: 'Marketing', prompt: 'Zaproponuj 20 hashtagów do postów Instagram dla [zawód] w Polsce, mieszanka niszowych i popularnych.' },
-  ],
-  'Trello + AI': [
-    { name: 'Tablica projektu', cat: 'Organizacja', prompt: 'Rozpisz tablicę Trello dla procesu od pierwszego zapytania klienta do finalnego dostarczenia usługi.' },
-    { name: 'Tygodniowy przegląd', cat: 'Organizacja', prompt: 'Stwórz szablon tygodniowego przeglądu zadań dla freelancera: 5 pytań do oceny tygodnia.' },
-    { name: 'Onboarding klienta', cat: 'Tekst', prompt: 'Napisz listę kroków onboardingu nowego klienta — od pierwszego kontaktu do startu realizacji.' },
-  ],
-  'Mailerlite AI': [
-    { name: 'Sekwencja powitalna', cat: 'Marketing', prompt: 'Napisz 3-mailową sekwencję powitalną dla nowych subskrybentów mojego newslettera jako [zawód].' },
-    { name: 'Email po usłudze', cat: 'Tekst', prompt: 'Napisz email wysyłany 7 dni po zakończeniu usługi: podzięk, pytanie o wrażenia, propozycja kolejnej współpracy.' },
-    { name: 'Oferta specjalna', cat: 'Marketing', prompt: 'Napisz email z limitowaną ofertą specjalną dla stałych klientów. Styl: ciepły, bez nachalnej sprzedaży.' },
-  ],
-  'Google Drive AI': [
-    { name: 'Struktura folderów', cat: 'Organizacja', prompt: 'Zaproponuj optymalną strukturę folderów Google Drive dla [zawód]: projekty, klienci, zasoby, archiwum.' },
-    { name: 'Nazewnictwo plików', cat: 'Organizacja', prompt: 'Stwórz system nazewnictwa plików dla [zawód] — daty, klienci, wersje — żeby łatwo szukać.' },
-    { name: 'Shared drive', cat: 'Produktywność', prompt: 'Jak skonfigurować Shared Drive do współpracy z klientem? Podaj 5 dobrych praktyk.' },
-  ],
-  'CapCut AI': [
-    { name: 'Scenariusz rolki', cat: 'Wideo', prompt: 'Ułóż scenariusz 30-sekundowej rolki pokazującej kulisy mojej pracy jako [zawód]. Hook + 3 sceny + CTA.' },
-    { name: 'Napisy do wideo', cat: 'Wideo', prompt: 'Napisz tekst do wideo "Dlaczego wybrałem zawód [zawód]" — styl szczery, 60 sekund mówienia.' },
-    { name: 'Pomysły na rolki', cat: 'Wideo', prompt: 'Podaj 10 pomysłów na rolki Instagram/TikTok dla [zawód], które angażują i budują markę osobistą.' },
-  ],
-  'Adobe Lightroom AI': [
-    { name: 'Preset workflow', cat: 'Grafika', prompt: 'Opisz workflow edycji zdjęć w Lightroom AI od importu do eksportu: jakie kroki, w jakiej kolejności.' },
-    { name: 'Styl wizualny', cat: 'Grafika', prompt: 'Pomóż mi opisać mój styl wizualny w 5 przymiotnikach i 3 zdaniach, które użyję w komunikacji marki.' },
-    { name: 'Eksport ustawienia', cat: 'Grafika', prompt: 'Jakie ustawienia eksportu z Lightroom stosować dla różnych celów: web, druk, social media, klient?' },
-  ],
-  'Remove.bg': [
-    { name: 'Kiedy używać', cat: 'Grafika', prompt: 'W jakich 5 sytuacjach usuwanie tła jest niezbędne w pracy [zawód]? Podaj konkretne przykłady.' },
-    { name: 'Workflow produktowy', cat: 'Grafika', prompt: 'Opisz krok po kroku jak przygotować zdjęcia produktowe do sklepu online z użyciem Remove.bg.' },
-    { name: 'Portfolio miniatura', cat: 'Grafika', prompt: 'Jak tworzyć spójne miniatury portfolio używając usuniętego tła? Podaj wytyczne stylistyczne.' },
-  ],
-}
-
-// ─── Helpery ──────────────────────────────────────────────────────────────────
-
-function buildPromptUrl(tool) {
-  if (tool.url?.includes('gemini.google.com')) {
-    return `https://gemini.google.com/app?text=${encodeURIComponent(tool.prompt || '')}`
-  }
-  return tool.url || 'https://gemini.google.com/'
-}
-
-function getToolLessons(tool) {
-  const promptSnippet = (tool.prompt || '').slice(0, 90) + ((tool.prompt || '').length > 90 ? '…' : '')
-  return [
-    {
-      id: tool.name + '-0',
-      title: 'Pierwsze kroki z ' + tool.name,
-      duration: '10 min',
-      desc: 'Poznaj interfejs i możliwości narzędzia. ' + tool.value,
-      task: 'Otwórz narzędzie i przetestuj gotowy prompt: „' + promptSnippet + '"',
-      url: tool.url || '#',
-      level: 'Podstawowy',
-    },
-    {
-      id: tool.name + '-1',
-      title: tool.name + ' w codziennej pracy',
-      duration: '15 min',
-      desc: 'Wdróż ' + tool.name + ' do realnych zadań. Kategoria: ' + tool.category + '. ' + tool.value,
-      task: 'Dostosuj gotowy prompt do konkretnego zadania z bieżącego tygodnia i zapisz efekt.',
-      url: tool.url || '#',
-      level: 'Średni',
-    },
-    {
-      id: tool.name + '-2',
-      title: 'Workflow z ' + tool.name + ' — oszczędność czasu',
-      duration: '20 min',
-      desc: 'Połącz ' + tool.name + ' z innymi narzędziami ze swojego stacka i zbuduj mini-automatyzację.',
-      task: 'Zapisz 3 przypadki, w których ' + tool.name + ' zastępuje Twoją manualną pracę.',
-      url: tool.url || '#',
-      level: 'Zaawansowany',
-    },
-  ]
-}
-
-function getStackInspirations(stack) {
-  const result = []
-  stack.forEach(function(tool) {
-    result.push({
-      id: tool.name + '-quick',
-      type: 'quick',
-      typeLabel: 'Szybki test',
-      time: '5 min',
-      title: 'Przetestuj ' + tool.name + ' dziś',
-      desc: 'Wybierz jedno realne zadanie z dziś i wykonaj je za pomocą ' + tool.name + '. ' + tool.value,
-      prompt: tool.prompt,
-      tool: tool.name,
-      url: tool.url || '#',
-    })
-    result.push({
-      id: tool.name + '-workflow',
-      type: 'workflow',
-      typeLabel: 'Workflow',
-      time: '30 min',
-      title: 'Mini-automatyzacja z ' + tool.name,
-      desc: 'Zidentyfikuj jeden powtarzalny proces i zautomatyzuj go za pomocą ' + tool.name + '. Kategoria: ' + tool.category + '.',
-      prompt: 'Opisz krok po kroku jak ' + tool.name + ' może zastąpić moją ręczną pracę przy: [wpisz zadanie]. Daj gotowy przepływ pracy.',
-      tool: tool.name,
-      url: tool.url || '#',
-    })
-    result.push({
-      id: tool.name + '-idea',
-      type: 'idea',
-      typeLabel: 'Pomysł',
-      time: '15 min',
-      title: tool.name + ' — nowe zastosowanie',
-      desc: 'Wymyśl nieoczywiste zastosowanie ' + tool.name + ' w kategorii ' + tool.category + '. Co możesz zrobić inaczej niż dotychczas?',
-      prompt: 'Podaj 5 nieoczywistych sposobów użycia ' + tool.name + ' dla kogoś w mojej pracy. Skup się na oszczędności czasu i energii.',
-      tool: tool.name,
-      url: tool.url || '#',
-    })
-  })
-  return result
-}
-
-function seededShuffle(arr, seed) {
-  const result = arr.slice()
-  let s = seed >>> 0
-  for (let i = result.length - 1; i > 0; i--) {
-    s = (Math.imul(s, 1664525) + 1013904223) >>> 0
-    const j = s % (i + 1)
-    const tmp = result[i]; result[i] = result[j]; result[j] = tmp
-  }
-  return result
-}
-
-function getStoredValue(key, fallback) {
-  try {
-    const raw = window.localStorage.getItem(key)
-    return raw ? JSON.parse(raw) : fallback
-  } catch {
-    return fallback
-  }
-}
-
-// ─── Toast ────────────────────────────────────────────────────────────────────
-
-function Toast({ message, onClose }) {
-  useEffect(() => {
-    const timer = setTimeout(onClose, 3500)
-    return () => clearTimeout(timer)
-  }, [message, onClose])
-
-  return (
-    <div className="toast" role="alert" aria-live="polite">
-      <span>{message}</span>
-      <button type="button" onClick={onClose} aria-label="Zamknij powiadomienie">
-        <X size={14} />
-      </button>
-    </div>
-  )
-}
+import Toast from './components/Toast'
+import StackSourceBadge from './components/StackSourceBadge'
+import WeeklyPlanPanel from './components/WeeklyPlanPanel'
+import OnboardingModal from './components/OnboardingModal'
+import HistoryView from './components/HistoryView'
+import ProfileDefaults from './components/ProfileDefaults'
+import { buildWeeklyPlan } from './lib/weeklyPlan'
+import { printStackReport } from './lib/exportPrint'
+import { BASE_AI_MODELS, PROMPT_CATS } from './data/constants'
+import { LIBRARY_EXAMPLES } from './data/libraryExamples'
+import {
+  CUSTOM_PROFESSION_ID,
+  areas,
+  fallbackStack,
+  getProfessionById,
+  navItems,
+  professions,
+  toolIcons,
+} from './data/professions'
+import { useInstallId } from './hooks/useInstallId'
+import { useTheme } from './hooks/useTheme'
+import { uniqueId } from './lib/id'
+import { buildPromptUrl } from './lib/promptUrl'
+import { getStackInspirations, getToolLessons, seededShuffle } from './lib/stackHelpers'
+import { describeStackStatus, requestStackGeneration } from './lib/stackApi'
+import {
+  buildDefaultsPayload,
+  getInitialFormState,
+  readUserDefaults,
+  saveUserDefaults,
+} from './lib/userDefaults'
+import {
+  downloadTextFile,
+  parsePromptbaseCsv,
+  serializePromptbaseCsv,
+} from './lib/promptCsv'
+import {
+  STORAGE_KEYS,
+  clearAppData,
+  exportAllData,
+  getJson,
+  getString,
+  importAllData,
+  setJson,
+  setString,
+} from './lib/storage'
 
 // ─── App ──────────────────────────────────────────────────────────────────────
 
 function App() {
+  useInstallId()
+  const { isDark, toggleTheme } = useTheme()
+
+  const initialForm = getInitialFormState()
   const [activeView, setActiveView] = useState('dashboard')
-  const [professionId, setProfessionId] = useState('fotograf')
-  const profession = professions.find((item) => item.id === professionId) ?? professions[0]
-  const [level, setLevel] = useState('Średni')
-  const [selectedAreas, setSelectedAreas] = useState(profession.defaults)
-  const [goal, setGoal] = useState(profession.goal)
-  const [toolsText, setToolsText] = useState(profession.tools.join(', '))
-  const [problem, setProblem] = useState(profession.problem)
-  const [stack, setStack] = useState(() => getStoredValue('ai_stack', []))
+  const [professionId, setProfessionId] = useState(initialForm.professionId)
+  const profession = getProfessionById(professionId)
+  const [customProfessionLabel, setCustomProfessionLabel] = useState(
+    initialForm.customProfessionLabel,
+  )
+  const [level, setLevel] = useState(initialForm.level)
+  const [selectedAreas, setSelectedAreas] = useState(initialForm.selectedAreas)
+  const [goal, setGoal] = useState(initialForm.goal)
+  const [toolsText, setToolsText] = useState(initialForm.toolsText)
+  const [problem, setProblem] = useState(initialForm.problem)
+  const [stack, setStack] = useState(() => getJson(STORAGE_KEYS.stack, []))
+  const [stackMeta, setStackMeta] = useState(() =>
+    getJson(STORAGE_KEYS.stackMeta, { source: 'demo', reason: 'missing-key' }),
+  )
   const [summary, setSummary] = useState({
     weeklyHours: '8-12 h',
     productivity: '+45%',
     monthlyValue: '650 zł+',
     fit: '92%',
   })
-  const [history, setHistory] = useState(() => getStoredValue('ai_stack_history', []))
-  const [savedPrompts, setSavedPrompts] = useState(() => getStoredValue('saved_prompts', []))
+  const [history, setHistory] = useState(() => getJson(STORAGE_KEYS.stackHistory, []))
+  const [savedPrompts, setSavedPrompts] = useState(() => getJson(STORAGE_KEYS.savedPrompts, []))
   const [promptFormOpen, setPromptFormOpen] = useState(true)
-  const [completedLessons, setCompletedLessons] = useState(() => getStoredValue('completed_lessons', []))
+  const [completedLessons, setCompletedLessons] = useState(() =>
+    getJson(STORAGE_KEYS.completedLessons, []),
+  )
   const [trainingFilter, setTrainingFilter] = useState('all')
   const [expandedTool, setExpandedTool] = useState(null)
-  const [doneInspirations, setDoneInspirations] = useState(() => getStoredValue('done_inspirations', []))
+  const [doneInspirations, setDoneInspirations] = useState(() =>
+    getJson(STORAGE_KEYS.doneInspirations, []),
+  )
   const [inspirationFilter, setInspirationFilter] = useState('all')
   const [shuffleSeed, setShuffleSeed] = useState(1)
   const [newPromptName, setNewPromptName] = useState('')
   const [newPromptModel, setNewPromptModel] = useState('')
   const [newPromptCat, setNewPromptCat] = useState('')
   const [newPromptText, setNewPromptText] = useState('')
-  const [projects, setProjects] = useState(() => getStoredValue('ai_projects', []))
+  const [projects, setProjects] = useState(() => getJson(STORAGE_KEYS.projects, []))
   const [projectName, setProjectName] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [geminiApiKey, setGeminiApiKey] = useState(
-    () => window.localStorage.getItem('gemini_api_key') || '',
-  )
-  const [keySaved, setKeySaved] = useState(Boolean(window.localStorage.getItem('gemini_api_key')))
+  const [geminiApiKey, setGeminiApiKey] = useState(() => getString(STORAGE_KEYS.geminiApiKey, ''))
+  const [keySaved, setKeySaved] = useState(Boolean(getString(STORAGE_KEYS.geminiApiKey, '')))
   const [apiKeyError, setApiKeyError] = useState('')
   const [status, setStatus] = useState(
-    window.localStorage.getItem('gemini_api_key')
+    getString(STORAGE_KEYS.geminiApiKey, '')
       ? 'Klucz Gemini zapisany. Możesz generować stack na żywo.'
       : 'Tryb demo. Wpisz klucz Gemini, aby generować wynik na żywo.',
   )
   const [toast, setToast] = useState(null)
   const [formStep, setFormStep] = useState(1)
-  const [userName, setUserName] = useState(() => window.localStorage.getItem('user_name') || '')
+  const [userName, setUserName] = useState(() => getString(STORAGE_KEYS.userName, ''))
   const [profileOpen, setProfileOpen] = useState(false)
+  const [showOnboarding, setShowOnboarding] = useState(
+    () => !getString(STORAGE_KEYS.onboardingCompleted, ''),
+  )
+  const [weeklyPlanDone, setWeeklyPlanDone] = useState(() =>
+    getJson(STORAGE_KEYS.weeklyPlanDone, []),
+  )
   const fileInputRef = useRef(null)
   const promptImportRef = useRef(null)
+  const backupImportRef = useRef(null)
+  const [defaultsLoadOnStart, setDefaultsLoadOnStart] = useState(
+    () => Boolean(readUserDefaults()?.loadOnStart),
+  )
+  const [historyCompareA, setHistoryCompareA] = useState(null)
+  const [historyCompareB, setHistoryCompareB] = useState(null)
 
-  // Sprawdź install_id — czyści dane przy nowej instalacji
-  useEffect(() => {
-    async function checkInstallId() {
-      try {
-        const res = await fetch('/api/install-id')
-        const data = await res.json()
-        const newId = data.installId || 'dev'
-        if (newId === 'dev') return
-        const storedId = window.localStorage.getItem('app_install_id')
-        if (storedId && storedId !== newId) {
-          const keysToKeep = ['app_install_id', 'gemini_api_key']
-          const toRemove = []
-          for (let i = 0; i < window.localStorage.length; i++) {
-            const k = window.localStorage.key(i)
-            if (k && !keysToKeep.includes(k)) toRemove.push(k)
-          }
-          toRemove.forEach(function(k) { window.localStorage.removeItem(k) })
-          window.location.reload()
-        }
-        if (!storedId || storedId !== newId) {
-          window.localStorage.setItem('app_install_id', newId)
-        }
-      } catch { /* tryb dev lub brak pliku */ }
+  function getProfessionLabel() {
+    if (professionId === CUSTOM_PROFESSION_ID) {
+      const custom = customProfessionLabel.trim()
+      return custom || 'Inny zawód'
     }
-    checkInstallId()
-  }, [])
+    return profession.label
+  }
 
   // Biblioteka – wyszukiwanie i filtrowanie
   const [librarySearch, setLibrarySearch] = useState('')
@@ -495,19 +185,29 @@ function App() {
     [toolsText],
   )
 
+  const weeklyPlan = useMemo(() => buildWeeklyPlan(stack), [stack])
+
   function showToast(message) {
     setToast(message)
   }
 
   function switchProfession(id) {
-    const next = professions.find((item) => item.id === id)
+    const next = getProfessionById(id)
     if (!next) return
     setProfessionId(id)
-    setSelectedAreas(next.defaults)
-    setGoal(next.goal)
-    setToolsText(next.tools.join(', '))
-    setProblem(next.problem)
+    setString(STORAGE_KEYS.professionId, id)
+    if (id !== CUSTOM_PROFESSION_ID) {
+      setSelectedAreas(next.defaults)
+      setGoal(next.goal)
+      setToolsText(next.tools.join(', '))
+      setProblem(next.problem)
+    }
     setFormStep(1)
+  }
+
+  function updateCustomProfessionLabel(value) {
+    setCustomProfessionLabel(value)
+    setString(STORAGE_KEYS.customProfessionLabel, value.trim())
   }
 
   function toggleArea(area) {
@@ -528,7 +228,7 @@ function App() {
   function saveGeminiApiKey() {
     const trimmedKey = geminiApiKey.trim()
     if (!trimmedKey) {
-      window.localStorage.removeItem('gemini_api_key')
+      setString(STORAGE_KEYS.geminiApiKey, '')
       setGeminiApiKey('')
       setKeySaved(false)
       setApiKeyError('')
@@ -542,65 +242,200 @@ function App() {
       return
     }
     setApiKeyError('')
-    window.localStorage.setItem('gemini_api_key', trimmedKey)
+    setString(STORAGE_KEYS.geminiApiKey, trimmedKey)
     setGeminiApiKey(trimmedKey)
     setKeySaved(true)
     setStatus('Klucz Gemini zapisany lokalnie. Możesz generować stack na żywo.')
     showToast('Klucz API zapisany pomyślnie.')
   }
 
-  function persistStack(nextStack, nextSummary) {
+  function applyFormState(form) {
+    setProfessionId(form.professionId)
+    setString(STORAGE_KEYS.professionId, form.professionId)
+    setCustomProfessionLabel(form.customProfessionLabel || '')
+    setString(STORAGE_KEYS.customProfessionLabel, (form.customProfessionLabel || '').trim())
+    setLevel(form.level)
+    setGoal(form.goal)
+    setSelectedAreas(form.selectedAreas)
+    setToolsText(form.toolsText)
+    setProblem(form.problem)
+    setFormStep(1)
+  }
+
+  function saveCurrentAsDefaults() {
+    const payload = buildDefaultsPayload(
+      {
+        professionId,
+        customProfessionLabel,
+        level,
+        goal,
+        problem,
+        toolsText,
+        selectedAreas,
+      },
+      defaultsLoadOnStart,
+    )
+    saveUserDefaults(payload)
+    showToast('Domyślne ustawienia zapisane.')
+  }
+
+  function applySavedDefaults() {
+    const prefs = readUserDefaults()
+    if (!prefs?.form) {
+      showToast('Brak zapisanych domyślnych ustawień.')
+      return
+    }
+    applyFormState(prefs.form)
+    showToast('Wczytano domyślne ustawienia formularza.')
+  }
+
+  function handleDefaultsLoadOnStart(checked) {
+    setDefaultsLoadOnStart(checked)
+    const prefs = readUserDefaults()
+    const form =
+      prefs?.form ?? {
+        professionId,
+        customProfessionLabel,
+        level,
+        goal,
+        problem,
+        toolsText,
+        selectedAreas,
+      }
+    saveUserDefaults(buildDefaultsPayload(form, checked))
+    if (checked && !prefs?.form) {
+      showToast('Zapisano bieżące ustawienia jako domyślne.')
+    }
+  }
+
+  function restoreHistoryEntry(item) {
+    if (!item.stack?.length) {
+      showToast('Ten wpis nie ma zapisanego stacka.')
+      return
+    }
+    setStack(item.stack)
+    setSummary(item.summary || summary)
+    if (item.meta) {
+      setStackMeta(item.meta)
+      setJson(STORAGE_KEYS.stackMeta, item.meta)
+    }
+    setJson(STORAGE_KEYS.stack, item.stack)
+    setWeeklyPlanDone([])
+    setJson(STORAGE_KEYS.weeklyPlanDone, [])
+    setActiveView('stack')
+    showToast('Stack wczytany z historii.')
+  }
+
+  function persistStack(nextStack, nextSummary, meta) {
     const historyItem = {
-      id: Date.now(),
+      id: uniqueId(),
       date: new Date().toLocaleString('pl-PL'),
-      profession: profession.label,
+      profession: getProfessionLabel(),
+      professionId,
+      level,
       goal,
+      problem,
+      areas: selectedAreas,
       count: nextStack.length,
+      source: meta?.source,
+      stack: nextStack,
+      summary: nextSummary,
+      meta: meta || stackMeta,
     }
     const nextHistory = [historyItem, ...history].slice(0, 20)
     setStack(nextStack)
     setSummary(nextSummary)
     setHistory(nextHistory)
-    window.localStorage.setItem('ai_stack', JSON.stringify(nextStack))
-    window.localStorage.setItem('ai_stack_history', JSON.stringify(nextHistory))
+    if (meta) {
+      setStackMeta(meta)
+      setJson(STORAGE_KEYS.stackMeta, meta)
+    }
+    setJson(STORAGE_KEYS.stack, nextStack)
+    setJson(STORAGE_KEYS.stackHistory, nextHistory)
+    setWeeklyPlanDone([])
+    setJson(STORAGE_KEYS.weeklyPlanDone, [])
+  }
+
+  function validateBeforeGenerate() {
+    if (professionId === CUSTOM_PROFESSION_ID && !customProfessionLabel.trim()) {
+      showToast('Wpisz nazwę swojego zawodu.')
+      setFormStep(1)
+      return false
+    }
+    return true
+  }
+
+  function quickGenerateStack() {
+    if (!validateBeforeGenerate()) return
+    setFormStep(3)
+    generateStack()
+  }
+
+  function exportStackPdf() {
+    if (!stack.length) {
+      showToast('Najpierw wygeneruj stack.')
+      return
+    }
+    try {
+      printStackReport({
+        profession: getProfessionLabel(),
+        level,
+        stack,
+        summary,
+        stackMeta,
+        weeklyPlan,
+      })
+      showToast('Otwarto widok druku — wybierz „Zapisz jako PDF”.')
+    } catch (error) {
+      showToast(error.message)
+    }
+  }
+
+  function toggleWeeklyPlanDay(dayId) {
+    const next = weeklyPlanDone.includes(dayId)
+      ? weeklyPlanDone.filter((id) => id !== dayId)
+      : [...weeklyPlanDone, dayId]
+    setWeeklyPlanDone(next)
+    setJson(STORAGE_KEYS.weeklyPlanDone, next)
+    if (!weeklyPlanDone.includes(dayId)) showToast('Dzień planu oznaczony jako zrobiony.')
+  }
+
+  function completeOnboarding() {
+    setString(STORAGE_KEYS.onboardingCompleted, '1')
+    setShowOnboarding(false)
   }
 
   async function generateStack() {
+    if (!validateBeforeGenerate()) return
+
     setIsLoading(true)
     setStatus('Gemini układa spersonalizowany AI Stack…')
-    try {
-      const response = await fetch('/api/generate-stack', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          profession: profession.label,
-          level,
-          goal,
-          areas: selectedAreas,
-          currentTools,
-          problem,
-          geminiApiKey: geminiApiKey.trim(),
-        }),
-      })
+    const hasApiKey = Boolean(geminiApiKey.trim())
 
-      const payload = await response.json()
-      if (!response.ok) throw new Error(payload.error || 'Nie udało się wygenerować stacka.')
+    try {
+      const { payload } = await requestStackGeneration({
+        profession: getProfessionLabel(),
+        level,
+        goal,
+        areas: selectedAreas,
+        currentTools,
+        problem,
+        geminiApiKey: geminiApiKey.trim(),
+      })
 
       const nextStack = payload.stack?.length ? payload.stack : fallbackStack
       const nextSummary = payload.summary || summary
-      persistStack(nextStack, nextSummary)
-      setStatus(
-        payload.meta?.source === 'gemini'
-          ? 'Wygenerowano przez Gemini API.'
-          : payload.meta?.reason === 'gemini-error'
-            ? 'Klucz Gemini odrzucony lub błąd API. Pokazuję demo.'
-            : 'Tryb demo – brak klucza Gemini.',
-      )
+      const meta = payload.meta || { source: 'demo', reason: 'missing-key' }
+      const { status: nextStatus, toast } = describeStackStatus(payload, hasApiKey)
+
+      persistStack(nextStack, nextSummary, meta)
+      setStatus(nextStatus)
       setActiveView('stack')
-      showToast('Stack wygenerowany pomyślnie!')
+      showToast(toast)
     } catch (error) {
-      persistStack(fallbackStack, summary)
-      setStatus('Błąd połączenia. Pokazuję bezpieczny stack demo.')
+      const meta = { source: 'demo', reason: 'network-error' }
+      persistStack(fallbackStack, summary, meta)
+      setStatus('Błąd połączenia z serwerem. Pokazuję bezpieczny stack demo.')
       showToast(`Błąd: ${error.message}`)
     } finally {
       setIsLoading(false)
@@ -609,18 +444,20 @@ function App() {
 
   function exportStack() {
     const data = {
-      version: 1,
+      version: 2,
       exportedAt: new Date().toISOString(),
-      profession: profession.label,
+      profession: getProfessionLabel(),
+      professionId,
       level,
       stack,
       summary,
+      meta: stackMeta,
     }
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `ai-stack-${profession.id}-${Date.now()}.json`
+    a.download = `ai-stack-${profession.id}-${uniqueId()}.json`
     a.click()
     URL.revokeObjectURL(url)
     showToast('Stack wyeksportowany jako plik .json')
@@ -642,10 +479,13 @@ function App() {
           showToast('Plik JSON ma nieprawidlowa strukture narzedzi.')
           return
         }
-        setStack(data.stack.slice(0, 10))
-        window.localStorage.setItem('ai_stack', JSON.stringify(data.stack.slice(0, 10)))
-        if (data.summary) {
-          setSummary(data.summary)
+        const imported = data.stack.slice(0, 10)
+        setStack(imported)
+        setJson(STORAGE_KEYS.stack, imported)
+        if (data.summary) setSummary(data.summary)
+        if (data.meta) {
+          setStackMeta(data.meta)
+          setJson(STORAGE_KEYS.stackMeta, data.meta)
         }
         setActiveView('stack')
         showToast('Stack wczytany z pliku: ' + data.stack.length + ' narzedzi.')
@@ -662,14 +502,14 @@ function App() {
       ...savedPrompts.filter((item) => item.prompt !== tool.prompt),
     ]
     setSavedPrompts(next)
-    window.localStorage.setItem('saved_prompts', JSON.stringify(next))
+    setJson(STORAGE_KEYS.savedPrompts, next)
     showToast(`Zapisano: ${tool.name}`)
   }
 
   function deletePrompt(id) {
     const next = savedPrompts.filter((item) => item.id !== id)
     setSavedPrompts(next)
-    window.localStorage.setItem('saved_prompts', JSON.stringify(next))
+    setJson(STORAGE_KEYS.savedPrompts, next)
     showToast('Prompt usunięty.')
   }
 
@@ -679,7 +519,7 @@ function App() {
       return
     }
     const entry = {
-      id: Date.now().toString(),
+      id: uniqueId(),
       name: newPromptName.trim(),
       model: newPromptModel,
       category: newPromptCat,
@@ -687,7 +527,7 @@ function App() {
     }
     const next = [entry, ...savedPrompts]
     setSavedPrompts(next)
-    window.localStorage.setItem('saved_prompts', JSON.stringify(next))
+    setJson(STORAGE_KEYS.savedPrompts, next)
     setNewPromptName('')
     setNewPromptModel('')
     setNewPromptCat('')
@@ -706,7 +546,7 @@ function App() {
   function savePromptQuick(name, prompt, model, cat) {
     if (!prompt) return
     const entry = {
-      id: Date.now().toString(),
+      id: uniqueId(),
       name: name || prompt.slice(0, 40),
       model: model || '',
       category: cat || '',
@@ -714,51 +554,185 @@ function App() {
     }
     const next = [entry, ...savedPrompts]
     setSavedPrompts(next)
-    window.localStorage.setItem('saved_prompts', JSON.stringify(next))
+    setJson(STORAGE_KEYS.savedPrompts, next)
     showToast('Prompt zapisany: ' + entry.name)
   }
 
   function clearHistory() {
     setHistory([])
-    window.localStorage.removeItem('ai_stack_history')
+    setJson(STORAGE_KEYS.stackHistory, [])
     showToast('Historia wyczyszczona.')
   }
 
-  function exportPrompts() {
-    if (!savedPrompts.length) { showToast('Brak promptów do eksportu.'); return }
+  function applyImportedPrompts(valid, replace) {
+    if (!valid.length) {
+      showToast('Nie znaleziono poprawnych promptów (wymagane: nazwa i treść).')
+      return
+    }
+
+    let next
+    let skipped = 0
+
+    if (replace) {
+      next = valid.map(function (p) {
+        return {
+          id: p.id || uniqueId(),
+          name: p.name,
+          model: p.model || '',
+          category: p.category || '',
+          prompt: p.prompt,
+        }
+      })
+    } else {
+      const existing = new Set(
+        savedPrompts.map(function (p) {
+          return p.name + '|' + p.prompt.slice(0, 50)
+        }),
+      )
+      const fresh = valid.filter(function (p) {
+        return !existing.has(p.name + '|' + p.prompt.slice(0, 50))
+      })
+      skipped = valid.length - fresh.length
+      next = [
+        ...fresh.map(function (p) {
+          return {
+            id: uniqueId(),
+            name: p.name,
+            model: p.model || '',
+            category: p.category || '',
+            prompt: p.prompt,
+          }
+        }),
+        ...savedPrompts,
+      ]
+    }
+
+    setSavedPrompts(next)
+    setJson(STORAGE_KEYS.savedPrompts, next)
+
+    if (replace) {
+      showToast('Zaimportowano ' + valid.length + ' promptów (zastąpiono listę).')
+    } else if (skipped > 0) {
+      showToast(
+        'Zaimportowano ' + (valid.length - skipped) + ' promptów. Pominięto duplikatów: ' + skipped + '.',
+      )
+    } else {
+      showToast('Zaimportowano ' + valid.length + ' promptów.')
+    }
+  }
+
+  function exportPromptsJson() {
+    if (!savedPrompts.length) {
+      showToast('Brak promptów do eksportu.')
+      return
+    }
     const data = { version: 1, exportedAt: new Date().toISOString(), prompts: savedPrompts }
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
     const a = document.createElement('a')
     a.href = URL.createObjectURL(blob)
-    a.download = 'ai-prompty-' + Date.now() + '.json'
+    a.download = 'ai-prompty-' + uniqueId() + '.json'
     a.click()
     URL.revokeObjectURL(a.href)
-    showToast('Wyeksportowano ' + savedPrompts.length + ' promptów.')
+    showToast('Wyeksportowano ' + savedPrompts.length + ' promptów (JSON).')
+  }
+
+  function exportPromptsCsv() {
+    if (!savedPrompts.length) {
+      showToast('Brak promptów do eksportu.')
+      return
+    }
+    const csv = serializePromptbaseCsv(savedPrompts)
+    const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+    downloadTextFile('biblioteka-promptow-' + stamp + '.csv', csv)
+    showToast('Wyeksportowano ' + savedPrompts.length + ' promptów (CSV PrompBase).')
   }
 
   function importPrompts(file) {
     const reader = new FileReader()
-    reader.onload = function(e) {
+    const isCsv = /\.csv$/i.test(file.name)
+
+    reader.onload = function (e) {
       try {
-        const data = JSON.parse(e.target.result)
-        const list = Array.isArray(data.prompts) ? data.prompts : (Array.isArray(data) ? data : null)
-        if (!list || !list.length) { showToast('Nieprawidłowy plik — brak promptów.'); return }
-        const valid = list.filter(function(p) { return p.name && p.prompt })
-        const next = [...valid.map(function(p) {
-          return { id: p.id || Date.now().toString() + Math.random(), name: p.name, model: p.model || '', category: p.category || '', prompt: p.prompt }
-        }), ...savedPrompts]
-        setSavedPrompts(next)
-        window.localStorage.setItem('saved_prompts', JSON.stringify(next))
-        showToast('Zaimportowano ' + valid.length + ' promptów.')
-      } catch { showToast('Błąd odczytu pliku JSON.') }
+        let valid = []
+
+        if (isCsv) {
+          valid = parsePromptbaseCsv(e.target.result)
+        } else {
+          const data = JSON.parse(e.target.result)
+          const list = Array.isArray(data.prompts) ? data.prompts : Array.isArray(data) ? data : null
+          if (!list) {
+            showToast('Nieprawidłowy plik — brak promptów.')
+            return
+          }
+          valid = list
+            .filter(function (p) {
+              return p.name && p.prompt
+            })
+            .map(function (p) {
+              return {
+                id: p.id,
+                name: p.name,
+                model: p.model || '',
+                category: p.category || '',
+                prompt: p.prompt,
+              }
+            })
+        }
+
+        if (!valid.length) {
+          showToast('Nie znaleziono poprawnych promptów w pliku.')
+          return
+        }
+
+        if (
+          !window.confirm('Znaleziono ' + valid.length + ' promptów. Kontynuować import?')
+        ) {
+          return
+        }
+
+        const replace = window.confirm(
+          'OK — dopisz nowe prompty do listy\n\nAnuluj — zastąp całą listę zapisanych promptów',
+        )
+        applyImportedPrompts(valid, !replace)
+      } catch {
+        showToast(isCsv ? 'Błąd odczytu pliku CSV.' : 'Błąd odczytu pliku JSON.')
+      }
     }
-    reader.readAsText(file)
+    reader.readAsText(file, 'utf-8')
   }
 
   function resetAllData() {
-    const keys = ['ai_stack','ai_stack_history','saved_prompts','ai_projects','completed_lessons','done_inspirations','user_name','app_install_id']
-    keys.forEach(function(k) { window.localStorage.removeItem(k) })
+    clearAppData()
     window.location.reload()
+  }
+
+  function exportBackup() {
+    const data = exportAllData()
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `ai-w-twoim-zawodzie-backup-${uniqueId()}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+    showToast('Backup wyeksportowany.')
+  }
+
+  function importBackup(file) {
+    const reader = new FileReader()
+    reader.onload = function (e) {
+      try {
+        const data = JSON.parse(e.target.result)
+        importAllData(data)
+        showToast('Backup zaimportowany. Odświeżam aplikację…')
+        setTimeout(function () {
+          window.location.reload()
+        }, 800)
+      } catch (err) {
+        showToast(err.message || 'Błąd importu backupu.')
+      }
+    }
+    reader.readAsText(file)
   }
 
   function toggleLesson(lessonId) {
@@ -766,7 +740,7 @@ function App() {
       ? completedLessons.filter(function(id) { return id !== lessonId })
       : [...completedLessons, lessonId]
     setCompletedLessons(next)
-    window.localStorage.setItem('completed_lessons', JSON.stringify(next))
+    setJson(STORAGE_KEYS.completedLessons, next)
     if (!completedLessons.includes(lessonId)) showToast('Lekcja ukończona!')
   }
 
@@ -775,7 +749,7 @@ function App() {
       ? doneInspirations.filter(function(x) { return x !== id })
       : [...doneInspirations, id]
     setDoneInspirations(next)
-    window.localStorage.setItem('done_inspirations', JSON.stringify(next))
+    setJson(STORAGE_KEYS.doneInspirations, next)
     if (!doneInspirations.includes(id)) showToast('Wyzwanie zaliczone!')
   }
 
@@ -783,12 +757,12 @@ function App() {
     const name = projectName.trim()
     if (!name) return
     const next = [
-      { id: Date.now(), name, profession: profession.label, status: 'Nowy' },
+      { id: uniqueId(), name, profession: getProfessionLabel(), status: 'Nowy' },
       ...projects,
     ]
     setProjects(next)
     setProjectName('')
-    window.localStorage.setItem('ai_projects', JSON.stringify(next))
+    setJson(STORAGE_KEYS.projects, next)
     showToast(`Dodano projekt: ${name}`)
   }
 
@@ -839,6 +813,18 @@ function App() {
               </select>
             </label>
           </div>
+          {professionId === CUSTOM_PROFESSION_ID && (
+            <label className="wide-field">
+              <span>Twój zawód / rola</span>
+              <input
+                type="text"
+                maxLength={60}
+                placeholder="np. Architekt wnętrz, fryzjer, trener personalny"
+                value={customProfessionLabel}
+                onChange={(e) => updateCustomProfessionLabel(e.target.value)}
+              />
+            </label>
+          )}
           <div className="form-actions">
             <button
               type="button"
@@ -917,7 +903,7 @@ function App() {
           <div>
             <strong>Klucz Gemini API (opcjonalnie)</strong>
             <p>
-              Wklej klucz raz i zapisz go lokalnie. Pobierzesz go w{' '}
+              Wklej klucz raz — zostaje tylko na tym komputerze (localStorage). Pobierzesz go w{' '}
               <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer">
                 Google AI Studio
               </a>
@@ -961,6 +947,24 @@ function App() {
   function renderDashboard() {
     return (
       <section className="content-grid">
+        <div className="quick-generate-bar">
+          <div>
+            <strong>Szybki start</strong>
+            <p>
+              Wygeneruj stack od razu z ustawień: <b>{getProfessionLabel()}</b> · {level}
+            </p>
+          </div>
+          <button
+            type="button"
+            className="primary quick-generate-btn"
+            disabled={isLoading}
+            onClick={quickGenerateStack}
+          >
+            {isLoading ? <Loader2 className="spin" size={18} /> : <Zap size={18} />}
+            Szybki stack
+          </button>
+        </div>
+
         <form
           className="builder-panel"
           onSubmit={(e) => {
@@ -973,7 +977,10 @@ function App() {
               <h2>Stwórz swój spersonalizowany AI Stack</h2>
               <p>Uzupełnij dane, wybierz obszary i wygeneruj gotowe workflow.</p>
             </div>
-            <span>{status}</span>
+            <div className="panel-status-row">
+              <span>{status}</span>
+              {stack.length > 0 && <StackSourceBadge meta={stackMeta} />}
+            </div>
           </div>
 
           {renderSteps()}
@@ -992,13 +999,18 @@ function App() {
           <div>
             <h2>Twój wygenerowany AI Stack</h2>
             <p>
-              Dopasowany do: <b>{profession.label}</b> · Poziom: <b>{level}</b>
+              Dopasowany do: <b>{getProfessionLabel()}</b> · Poziom: <b>{level}</b>
             </p>
+            <StackSourceBadge meta={stackMeta} />
           </div>
           <div className="stack-export-btns">
+            <button type="button" onClick={exportStackPdf} title="Drukuj lub zapisz jako PDF">
+              <FileText size={17} />
+              PDF
+            </button>
             <button type="button" onClick={exportStack}>
               <Download size={17} />
-              Eksportuj
+              JSON
             </button>
             <button type="button" onClick={() => fileInputRef.current && fileInputRef.current.click()}>
               <Save size={17} />
@@ -1074,6 +1086,15 @@ function App() {
         <p className="metrics-disclaimer">
           * Wartości szacunkowe wygenerowane przez AI na podstawie podanych danych – nie stanowią gwarancji wyników.
         </p>
+
+        {stack.length > 0 && (
+          <WeeklyPlanPanel
+            plan={weeklyPlan}
+            doneIds={weeklyPlanDone}
+            onToggleDay={toggleWeeklyPlanDay}
+            onCopyPrompt={copyPromptText}
+          />
+        )}
       </section>
     )
   }
@@ -1133,62 +1154,33 @@ function App() {
     )
   }
 
-  function renderHistory() {
-    return (
-      <section className="view-panel">
-        <div className="panel-heading">
-          <div>
-            <h2>Historia generowania</h2>
-            <p>{history.length} wpisów</p>
-          </div>
-          {history.length > 0 && (
-            <button type="button" className="btn-danger-ghost" onClick={clearHistory}>
-              <Trash2 size={15} /> Wyczyść historię
-            </button>
-          )}
-        </div>
-        <div className="list-panel">
-          {history.length ? (
-            history.map((item) => (
-              <article className="history-row" key={item.id}>
-                <div>
-                  <strong>{item.profession}</strong>
-                  <p>{item.goal}</p>
-                </div>
-                <span>{item.count} narzędzi</span>
-                <small>{item.date}</small>
-              </article>
-            ))
-          ) : (
-            <p className="empty-hint">Brak historii. Wygeneruj pierwszy stack z dashboardu.</p>
-          )}
-        </div>
-      </section>
-    )
-  }
-
   function renderPrompts() {
     const stackModelNames = stack.map(function(t) { return t.name })
-    const allModels = Array.from(new Set([...stackModelNames, ...BASE_AI_MODELS]))
 
     return (
       <section className="view-panel">
         <div className="panel-heading">
           <div>
             <h2>Zapisane prompty</h2>
-            <p>{savedPrompts.length} zapisanych promptów</p>
+            <p>
+              {savedPrompts.length} zapisanych promptów · import/eksport CSV zgodny z{' '}
+              <strong>PrompBase</strong>
+            </p>
           </div>
           <div className="prompt-header-actions">
             <button type="button" className="btn-add-prompt" onClick={() => setPromptFormOpen(function(v) { return !v })}>
               <Plus size={16} /> {promptFormOpen ? 'Anuluj' : 'Nowy prompt'}
             </button>
-            <button type="button" className="btn-export-prompts" onClick={exportPrompts}>
-              <Download size={15} /> Eksportuj
+            <button type="button" className="btn-export-prompts" onClick={exportPromptsJson} title="Eksport JSON (ta aplikacja)">
+              <Download size={15} /> JSON
             </button>
-            <button type="button" className="btn-export-prompts" onClick={function() { promptImportRef.current && promptImportRef.current.click() }}>
+            <button type="button" className="btn-export-prompts" onClick={exportPromptsCsv} title="Eksport CSV do PrompBase">
+              <Download size={15} /> CSV
+            </button>
+            <button type="button" className="btn-export-prompts" onClick={function() { promptImportRef.current && promptImportRef.current.click() }} title="Import JSON lub CSV (PrompBase)">
               <Save size={15} /> Importuj
             </button>
-            <input ref={promptImportRef} type="file" accept=".json" style={{display:'none'}} onChange={function(e){ if(e.target.files&&e.target.files[0]){importPrompts(e.target.files[0]);e.target.value=''} }} />
+            <input ref={promptImportRef} type="file" accept=".json,.csv,application/json,text/csv" style={{display:'none'}} onChange={function(e){ if(e.target.files&&e.target.files[0]){importPrompts(e.target.files[0]);e.target.value=''} }} />
           </div>
         </div>
 
@@ -1385,30 +1377,6 @@ function App() {
             })
           ) : (
             <p>Brak wyników dla podanych filtrów.</p>
-          )}
-        </div>
-      </section>
-    )
-  }
-
-  function renderSimpleList(title, items) {
-    return (
-      <section className="view-panel">
-        <h2>{title}</h2>
-        <div className="item-grid">
-          {items.map((item) =>
-            Array.isArray(item) ? (
-              <article className="item-card" key={item[0]}>
-                <strong>{item[0]}</strong>
-                <span>{item[1]}</span>
-                <p>{item[2]}</p>
-              </article>
-            ) : (
-              <article className="item-card" key={item}>
-                <strong>{item}</strong>
-                <p>Gotowy pomysł do przetestowania w tym tygodniu.</p>
-              </article>
-            ),
           )}
         </div>
       </section>
@@ -1652,7 +1620,25 @@ function App() {
     if (activeView === 'dashboard') return renderDashboard()
     if (activeView === 'stack') return <div className="single-view">{renderStackPanel()}</div>
     if (activeView === 'projects') return renderProjects()
-    if (activeView === 'history') return renderHistory()
+    if (activeView === 'history') {
+      return (
+        <HistoryView
+          history={history}
+          compareSlotA={historyCompareA}
+          compareSlotB={historyCompareB}
+          onSelectCompare={function (a, b) {
+            setHistoryCompareA(a)
+            setHistoryCompareB(b)
+          }}
+          onClearCompare={function () {
+            setHistoryCompareA(null)
+            setHistoryCompareB(null)
+          }}
+          onRestore={restoreHistoryEntry}
+          onClearHistory={clearHistory}
+        />
+      )
+    }
     if (activeView === 'prompts') return renderPrompts()
     if (activeView === 'tools') return renderLibrary()
     if (activeView === 'training') return renderTraining()
@@ -1665,6 +1651,7 @@ function App() {
 
   return (
     <div className="app-shell">
+      {showOnboarding && <OnboardingModal onComplete={completeOnboarding} />}
       {toast && <Toast message={toast} onClose={() => setToast(null)} />}
 
       <aside className="sidebar">
@@ -1722,6 +1709,15 @@ function App() {
             <p>Darmowa aplikacja do budowania praktycznych workflow AI.</p>
           </div>
           <div className="top-actions">
+            <button
+              type="button"
+              className="theme-toggle"
+              onClick={toggleTheme}
+              aria-label={isDark ? 'Włącz jasny motyw' : 'Włącz ciemny motyw'}
+              title={isDark ? 'Jasny motyw' : 'Ciemny motyw'}
+            >
+              {isDark ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
             <div className="profile-wrapper">
               <button className="profile" type="button" onClick={function(){ setProfileOpen(function(o){ return !o }) }}>
                 {initials} <ChevronDown size={15} />
@@ -1729,7 +1725,60 @@ function App() {
               {profileOpen && (
                 <div className="profile-dropdown">
                   <label className="profile-label">Twoje imie</label>
-                  <input className="profile-input" type="text" value={userName} placeholder="np. Jan Kowalski" onChange={function(e){ setUserName(e.target.value); window.localStorage.setItem('user_name', e.target.value) }} />
+                  <input
+                    className="profile-input"
+                    type="text"
+                    value={userName}
+                    placeholder="np. Jan Kowalski"
+                    onChange={function (e) {
+                      setUserName(e.target.value)
+                      setString(STORAGE_KEYS.userName, e.target.value)
+                    }}
+                  />
+                  <p className="profile-hint">Klucz API jest zapisywany tylko lokalnie w tej przeglądarce.</p>
+
+                  <ProfileDefaults
+                    professionId={professionId}
+                    professions={professions}
+                    customProfessionId={CUSTOM_PROFESSION_ID}
+                    customProfessionLabel={customProfessionLabel}
+                    level={level}
+                    goal={goal}
+                    problem={problem}
+                    toolsText={toolsText}
+                    selectedAreas={selectedAreas}
+                    loadOnStart={defaultsLoadOnStart}
+                    onLoadOnStartChange={handleDefaultsLoadOnStart}
+                    onSaveDefaults={saveCurrentAsDefaults}
+                    onApplyDefaults={applySavedDefaults}
+                  />
+
+                  <hr className="profile-divider" />
+
+                  <button type="button" className="ghost profile-backup-btn" onClick={exportBackup}>
+                    <Download size={13} /> Eksportuj backup danych
+                  </button>
+                  <button
+                    type="button"
+                    className="ghost profile-backup-btn"
+                    onClick={function () {
+                      backupImportRef.current?.click()
+                    }}
+                  >
+                    <Save size={13} /> Importuj backup
+                  </button>
+                  <input
+                    ref={backupImportRef}
+                    type="file"
+                    accept=".json,application/json"
+                    className="visually-hidden"
+                    onChange={function (e) {
+                      if (e.target.files?.[0]) {
+                        importBackup(e.target.files[0])
+                        e.target.value = ''
+                      }
+                    }}
+                  />
                   <button className="ghost profile-close" type="button" onClick={function(){ setProfileOpen(false) }}>Zamknij</button>
                   <button className="btn-danger-ghost profile-reset" type="button" onClick={function(){ if(window.confirm('Usunąć wszystkie dane aplikacji?')) resetAllData() }}>
                     <Trash2 size={13} /> Resetuj wszystkie dane

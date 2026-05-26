@@ -160,7 +160,7 @@ const INSPIRATIONS = [
     category: 'Automatyzacja',
     title: 'Checklista procesu z AI',
     challenge: 'Opisz AI swój typowy proces pracy od A do Z. Dostaniesz gotową checklistę, którą użyjesz przy każdym projekcie.',
-    prompt: 'Mój typowy proces pracy wygląda mniej więcej tak:\n[OPISZ KROKI — od pierwszego kontaktu z klientem do dostarczenia efektu]\n\nJestem [ZAWÓD]. Na podstawie tego opisu:\n1. Stwórz checklistę 15-20 kroków z podziałem na fazy (przed/w trakcie/po)\n2. Zaznacz, przy których krokach AI może mi pomóc i jak\n3. Dodaj kolumnę \"gotowy do użycia prompt\" dla 3 kluczowych kroków\n\nFormat: gotowy do wklejenia do Notion lub wydruku.',
+    prompt: 'Mój typowy proces pracy wygląda mniej więcej tak:\n[OPISZ KROKI — od pierwszego kontaktu z klientem do dostarczenia efektu]\n\nJestem [ZAWÓD]. Na podstawie tego opisu:\n1. Stwórz checklistę 15-20 kroków z podziałem na fazy (przed/w trakcie/po)\n2. Zaznacz, przy których krokach AI może mi pomóc i jak\n3. Dodaj kolumnę "gotowy do użycia prompt" dla 3 kluczowych kroków\n\nFormat: gotowy do wklejenia do Notion lub wydruku.',
     time: '20 min',
     difficulty: 'Średnie',
   },

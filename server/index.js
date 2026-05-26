@@ -96,9 +96,20 @@ function isUsableApiKey(value) {
 }
 
 // Sanityzacja wejścia użytkownika
+function stripControlChars(value) {
+  let out = ''
+  for (const char of value) {
+    const code = char.charCodeAt(0)
+    if (code === 9 || code === 10 || code === 13 || (code >= 32 && code !== 127)) {
+      out += char
+    }
+  }
+  return out
+}
+
 function sanitizeStr(value, maxLen = 500) {
   if (typeof value !== 'string') return ''
-  return value.slice(0, maxLen).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '').trim()
+  return stripControlChars(value.slice(0, maxLen)).trim()
 }
 
 function sanitizeArr(value, maxItems = 10, maxItemLen = 80) {

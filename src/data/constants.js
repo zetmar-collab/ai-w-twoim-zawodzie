@@ -1,0 +1,32 @@
+export const BASE_AI_MODELS = [
+  'ChatGPT (GPT-4o)',
+  'ChatGPT (GPT-4)',
+  'Claude 3.5 Sonnet',
+  'Claude 3 Opus',
+  'Gemini 2.5 Flash',
+  'Gemini 2.0 Pro',
+  'Copilot',
+  'Perplexity',
+  'Midjourney',
+  'DALL-E 3',
+  'Stable Diffusion',
+  'Adobe Firefly',
+  'Canva AI',
+  'Runway ML',
+  'Suno AI',
+  'ElevenLabs',
+  'Notion AI',
+]
+
+export const PROMPT_CATS = [
+  'Tekst',
+  'Grafika',
+  'Kod',
+  'Marketing',
+  'Research',
+  'Wideo',
+  'Audio',
+  'Organizacja',
+  'Sprzedaż',
+  'Inne',
+]

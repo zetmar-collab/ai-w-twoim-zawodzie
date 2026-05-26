@@ -1,32 +1,22 @@
 import { useRef } from 'react'
 import {
   BriefcaseBusiness,
-  Camera,
   Check,
   Download,
   ExternalLink,
-  FileText,
-  MessageSquareText,
   Save,
-  Search,
   Sparkles,
   Target,
   Upload,
-  WandSparkles,
 } from 'lucide-react'
-
-const toolIcons = [MessageSquareText, Camera, WandSparkles, Search, FileText, Target]
-
-function buildPromptUrl(tool) {
-  if (tool.url?.includes('gemini.google.com')) {
-    return `https://gemini.google.com/app?text=${encodeURIComponent(tool.prompt || '')}`
-  }
-  return tool.url || 'https://gemini.google.com/'
-}
+import StackSourceBadge from './StackSourceBadge'
+import { toolIcons } from '../data/professions'
+import { buildPromptUrl } from '../lib/promptUrl'
 
 export default function StackPanel({
   stack,
   summary,
+  stackMeta,
   profession,
   level,
   compact = false,
@@ -53,6 +43,7 @@ export default function StackPanel({
           <p>
             Dopasowany do: <b>{profession}</b> · Poziom: <b>{level}</b>
           </p>
+          <StackSourceBadge meta={stackMeta} />
         </div>
         <div className="stack-actions">
           <button type="button" className="stack-action-btn" onClick={onExport} title="Pobierz stack jako plik JSON">
@@ -136,6 +127,9 @@ export default function StackPanel({
           <p>do potrzeb</p>
         </div>
       </div>
+      <p className="metrics-disclaimer">
+        * Wartości szacunkowe wygenerowane przez AI — nie stanowią gwarancji wyników.
+      </p>
     </section>
   )
 }
